@@ -27,6 +27,8 @@ SMock breaks down the barriers of testing legacy code, third-party dependencies,
 
 ## Installation
 
+See the [changelog](CHANGELOG.md) for changes and the [release guide](docs/releasing.md) for the tag-based publishing process.
+
 ### Package Manager
 ```powershell
 Install-Package SMock

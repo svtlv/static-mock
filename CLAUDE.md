@@ -58,12 +58,19 @@ dotnet run --project src/StaticMock.Tests.Benchmark/StaticMock.Tests.Benchmark.c
 ```
 
 ### Package Building and Publishing
+
+Official releases are triggered by pushing a `vX.Y.Z` (or prerelease) tag.
+The tag must match the project `<Version>` and a dated section in `CHANGELOG.md`.
+Follow `docs/releasing.md`; `.github/workflows/release.yaml` tests, packs, publishes
+to NuGet and GitHub Packages, and creates the GitHub release. Keep changes under
+`Unreleased` until preparing a specific release.
+
 ```bash
 # Pack the library for NuGet publication
 dotnet pack --configuration Release --output packages src/StaticMock/StaticMock.csproj
 
-# Publish to NuGet (requires API key)
-dotnet nuget push packages/*.nupkg -k <NUGET_API_KEY> -s https://api.nuget.org/v3/index.json
+# Validate release metadata before tagging (PowerShell)
+pwsh -File scripts/prepare-release.ps1 -Tag vX.Y.Z
 ```
 
 ## Architecture Overview

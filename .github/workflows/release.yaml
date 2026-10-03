@@ -1,0 +1,114 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+      prerelease: ${{ steps.release.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Validate tag, package version, and changelog
+        id: release
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_REF_TYPE: ${{ github.ref_type }}
+        run: |
+          if ($env:RELEASE_REF_TYPE -ne 'tag') { throw 'Select a version tag to release, not a branch.' }
+          ./scripts/prepare-release.ps1 -Tag $env:RELEASE_TAG -OutputPath release-notes.md
+
+  test:
+    needs: validate
+    uses: ./.github/workflows/build_and_test.yaml
+
+  pack:
+    needs: [validate, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - name: Prepare release notes
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: ./scripts/prepare-release.ps1 -Tag $env:RELEASE_TAG -OutputPath packages/release-notes.md
+      - name: Pack
+        env:
+          RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+        run: dotnet pack src/StaticMock/StaticMock.csproj --configuration Release --output packages -p:Version="$RELEASE_VERSION" -p:ContinuousIntegrationBuild=true -p:RepositoryCommit="$GITHUB_SHA"
+      - name: Calculate package checksum
+        working-directory: packages
+        run: sha256sum *.nupkg > checksums.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-packages
+          path: packages/*
+          if-no-files-found: error
+
+  publish:
+    needs: [validate, pack]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-packages
+          path: packages
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - name: Verify package checksum
+        working-directory: packages
+        run: sha256sum --check checksums.txt
+      - name: Check NuGet credentials
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          if [ -z "$NUGET_API_KEY" ]; then
+            echo '::error::Configure the NUGET_API_KEY repository secret before releasing.'
+            exit 1
+          fi
+      - name: Publish to NuGet
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: dotnet nuget push 'packages/*.nupkg' --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Publish to GitHub Packages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PACKAGE_OWNER: ${{ github.repository_owner }}
+        run: dotnet nuget push 'packages/*.nupkg' --api-key "$GH_TOKEN" --source "https://nuget.pkg.github.com/$PACKAGE_OWNER/index.json" --skip-duplicate
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          PRERELEASE: ${{ needs.validate.outputs.prerelease }}
+        run: |
+          flags=()
+          if [ "$PRERELEASE" = true ]; then
+            flags+=(--prerelease --latest=false)
+          fi
+          gh release create "$RELEASE_TAG" packages/*.nupkg packages/checksums.txt \
+            --verify-tag --title "$RELEASE_TAG" --notes-file packages/release-notes.md "${flags[@]}"

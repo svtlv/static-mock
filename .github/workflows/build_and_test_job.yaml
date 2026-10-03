@@ -24,7 +24,7 @@ on:
     inputs:
       os:
         type: string
-        required: true
+        required: false
         default: ubuntu-latest
       configuration:
         type: string
@@ -53,11 +53,11 @@ jobs:
     - name: TestUnix
       if: ${{ startsWith(inputs.os, 'ubuntu') || startsWith(inputs.os, 'macos') }}
       run: |
-        set +e  # Disable exit on error to ensure all frameworks are tested
-        dotnet test --framework net8.0 --no-build --configuration ${{ inputs.configuration }} --verbosity minimal --logger "trx;LogFileName=${{ inputs.os }}/${{ inputs.configuration }}/net8.0/testResults.trx"
-        dotnet test --framework net9.0 --no-build --configuration ${{ inputs.configuration }} --verbosity minimal --logger "trx;LogFileName=${{ inputs.os }}/${{ inputs.configuration }}/net9.0/testResults.trx"
-        dotnet test --framework net10.0 --no-build --configuration ${{ inputs.configuration }} --verbosity minimal --logger "trx;LogFileName=${{ inputs.os }}/${{ inputs.configuration }}/net10.0/testResults.trx"
-        set -e  # Re-enable exit on error
+        status=0
+        for framework in net8.0 net9.0 net10.0; do
+          dotnet test --framework "$framework" --no-build --configuration ${{ inputs.configuration }} --verbosity minimal --logger "trx;LogFileName=${{ inputs.os }}/${{ inputs.configuration }}/$framework/testResults.trx" || status=1
+        done
+        exit "$status"
       working-directory: ./src
     - name: Test Report
       uses: dorny/test-reporter@v3
