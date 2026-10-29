@@ -378,6 +378,6 @@ SMock maintains backward compatibility within major versions. Breaking changes a
 ## See Also
 
 - [Getting Started Guide](../articles/getting-started.md) - Complete walkthrough with examples
-- [GitHub Repository](https://github.com/SvetlovA/static-mock) - Source code and issues
+- [GitHub Repository](https://github.com/svtlv/static-mock) - Source code and issues
 - [NuGet Package](https://www.nuget.org/packages/SMock) - Package downloads and versions
-- [Release Notes](https://github.com/SvetlovA/static-mock/releases) - Version history and changes
+- [Release Notes](https://github.com/svtlv/static-mock/releases) - Version history and changes

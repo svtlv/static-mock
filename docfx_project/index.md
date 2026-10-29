@@ -2,7 +2,7 @@
 
 [![NuGet Version](https://img.shields.io/nuget/v/SMock.svg?style=for-the-badge&logo=nuget)](https://www.nuget.org/packages/SMock)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/SMock.svg?style=for-the-badge&logo=nuget)](https://www.nuget.org/packages/SMock)
-[![GitHub Stars](https://img.shields.io/github/stars/SvetlovA/static-mock?style=for-the-badge&logo=github)](https://github.com/SvetlovA/static-mock/stargazers)
+[![GitHub Stars](https://img.shields.io/github/stars/svtlv/static-mock?style=for-the-badge&logo=github)](https://github.com/svtlv/static-mock/stargazers)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge)](LICENSE)
 [![.NET Version](https://img.shields.io/badge/.NET-Standard%202.0%2B-purple.svg?style=for-the-badge)](https://dotnet.microsoft.com/)
 
@@ -288,8 +288,8 @@ Mock.Setup(context => MyClass.Process(context.It.IsAny<string>())).Returns("resu
 
 - 📖 [Full API Documentation](api/index.md)
 - 📝 [Comprehensive Examples](articles/getting-started.md)
-- 🐛 [Report Issues](https://github.com/SvetlovA/static-mock/issues)
-- 💬 [Join Discussions](https://github.com/SvetlovA/static-mock/discussions)
+- 🐛 [Report Issues](https://github.com/svtlv/static-mock/issues)
+- 💬 [Join Discussions](https://github.com/svtlv/static-mock/discussions)
 
 ---
 
@@ -317,7 +317,7 @@ Ready to dive deeper? Explore our comprehensive documentation:
 
 SMock is developed and maintained as an open-source project. If you find it useful and would like to support its continued development, consider sponsoring the project:
 
-- ⭐ **[GitHub Sponsors](https://github.com/sponsors/SvetlovA)** - Direct support through GitHub
+- ⭐ **[GitHub Sponsors](https://github.com/sponsors/svtlv)** - Direct support through GitHub
 - 🎯 **[Patreon](https://patreon.com/svtlv)** - Monthly support with exclusive updates
 - 💝 **[Boosty](https://boosty.to/svtlv)** - Alternative sponsorship platform
 
@@ -325,8 +325,8 @@ Your support helps maintain the project, add new features, and provide community
 
 ## License
 
-SMock is available under the [MIT License](https://github.com/SvetlovA/static-mock/blob/master/LICENSE).
+SMock is available under the [MIT License](https://github.com/svtlv/static-mock/blob/master/LICENSE).
 
 ---
 
-*Made with ❤️ by [@SvetlovA](https://github.com/SvetlovA) and the SMock community*
+*Made with ❤️ by [@svtlv](https://github.com/svtlv) and the SMock community*

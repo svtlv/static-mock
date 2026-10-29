@@ -742,8 +742,8 @@ When reporting issues, include:
 
 ### Community Resources
 
-- **GitHub Issues**: [Report bugs and feature requests](https://github.com/SvetlovA/static-mock/issues)
-- **GitHub Discussions**: [Ask questions and share solutions](https://github.com/SvetlovA/static-mock/discussions)
+- **GitHub Issues**: [Report bugs and feature requests](https://github.com/svtlv/static-mock/issues)
+- **GitHub Discussions**: [Ask questions and share solutions](https://github.com/svtlv/static-mock/discussions)
 - **Documentation**: [Complete API reference](../api/index.md)
 - **Examples**: [Real-world usage patterns](real-world-examples.md)
 
@@ -755,7 +755,7 @@ For enterprise users requiring professional support:
 - Performance optimization consulting
 - Training and onboarding
 
-Contact: [GitHub Sponsors](https://github.com/sponsors/SvetlovA) for enterprise support options.
+Contact: [GitHub Sponsors](https://github.com/sponsors/svtlv) for enterprise support options.
 
 This troubleshooting guide should help you resolve most SMock-related issues. If you encounter problems not covered here, please contribute to the community by sharing your solution!
 
@@ -773,8 +773,8 @@ This troubleshooting guide should help you resolve most SMock-related issues. If
 - **[API Reference](../api/index.md)** - Detailed method signatures and usage examples
 
 ### Community Support
-- **[GitHub Issues](https://github.com/SvetlovA/static-mock/issues)** - Search existing issues or report new bugs
-- **[GitHub Discussions](https://github.com/SvetlovA/static-mock/discussions)** - Ask questions and get community help
+- **[GitHub Issues](https://github.com/svtlv/static-mock/issues)** - Search existing issues or report new bugs
+- **[GitHub Discussions](https://github.com/svtlv/static-mock/discussions)** - Ask questions and get community help
 - **[Stack Overflow](https://stackoverflow.com/questions/tagged/smock)** - General programming questions with SMock tag
 
 ### Preventive Resources

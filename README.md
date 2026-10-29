@@ -4,7 +4,7 @@
 
 [![NuGet Version](https://img.shields.io/nuget/v/SMock.svg?style=for-the-badge&logo=nuget)](https://www.nuget.org/packages/SMock)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/SMock.svg?style=for-the-badge&logo=nuget)](https://www.nuget.org/packages/SMock)
-[![GitHub Stars](https://img.shields.io/github/stars/SvetlovA/static-mock?style=for-the-badge&logo=github)](https://github.com/SvetlovA/static-mock/stargazers)
+[![GitHub Stars](https://img.shields.io/github/stars/svtlv/static-mock?style=for-the-badge&logo=github)](https://github.com/svtlv/static-mock/stargazers)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge)](LICENSE)
 [![.NET Version](https://img.shields.io/badge/.NET-Standard%202.0%2B-purple.svg?style=for-the-badge)](https://dotnet.microsoft.com/)
 
@@ -212,7 +212,7 @@ This repository ships a **Claude Code plugin** that teaches Claude how to write 
 From any project, run inside Claude Code:
 
 ```
-/plugins install github:SvetlovA/static-mock
+/plugins install github:svtlv/static-mock
 ```
 
 Or load for a single session:
@@ -248,16 +248,16 @@ The skill also activates automatically when you ask Claude to *"add tests"*, *"c
 
 ## Additional Resources
 
-- **[API Documentation](https://svetlova.github.io/static-mock/api/index.html)**
-- **[More Examples](https://github.com/SvetlovA/static-mock/tree/master/src/StaticMock.Tests/Tests)**
-- **[Hierarchical API Examples](https://github.com/SvetlovA/static-mock/tree/master/src/StaticMock.Tests/Tests/Hierarchical)**
-- **[Sequential API Examples](https://github.com/SvetlovA/static-mock/tree/master/src/StaticMock.Tests/Tests/Sequential)**
+- **[API Documentation](https://svtlv.github.io/static-mock/api/index.html)**
+- **[More Examples](https://github.com/svtlv/static-mock/tree/master/src/StaticMock.Tests/Tests)**
+- **[Hierarchical API Examples](https://github.com/svtlv/static-mock/tree/master/src/StaticMock.Tests/Tests/Hierarchical)**
+- **[Sequential API Examples](https://github.com/svtlv/static-mock/tree/master/src/StaticMock.Tests/Tests/Sequential)**
 
 ---
 
 ## 📄 License
 
-This library is available under the [MIT license](https://github.com/SvetlovA/static-mock/blob/master/LICENSE).
+This library is available under the [MIT license](https://github.com/svtlv/static-mock/blob/master/LICENSE).
 
 ---
 
@@ -265,10 +265,10 @@ This library is available under the [MIT license](https://github.com/SvetlovA/st
 
 ## 🚀 Ready to revolutionize your .NET testing?
 
-**[⚡ Get Started Now](#installation)** | **[📚 View Examples](https://github.com/SvetlovA/static-mock/tree/master/src/StaticMock.Tests/Tests)** | **[💬 Join Discussion](https://github.com/SvetlovA/static-mock/discussions)**
+**[⚡ Get Started Now](#installation)** | **[📚 View Examples](https://github.com/svtlv/static-mock/tree/master/src/StaticMock.Tests/Tests)** | **[💬 Join Discussion](https://github.com/svtlv/static-mock/discussions)**
 
 ---
 
-*Made with ❤️ by [@SvetlovA](https://github.com/SvetlovA) and the SMock community*
+*Made with ❤️ by [@svtlv](https://github.com/svtlv) and the SMock community*
 
 </div>

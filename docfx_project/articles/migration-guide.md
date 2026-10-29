@@ -10,7 +10,7 @@ This guide helps you migrate between different versions of SMock and provides gu
 
 ### Upgrading to Latest Version
 
-When upgrading SMock, always check the [release notes](https://github.com/SvetlovA/static-mock/releases) for breaking changes.
+When upgrading SMock, always check the [release notes](https://github.com/svtlv/static-mock/releases) for breaking changes.
 
 #### Package Update Commands
 
@@ -133,8 +133,8 @@ public void TestWithSMock()
 If you encounter issues during migration:
 
 1. **Check Release Notes**: Review the specific version's release notes for known issues
-2. **Search Issues**: Check [GitHub Issues](https://github.com/SvetlovA/static-mock/issues) for similar problems
-3. **Community Support**: Ask in [GitHub Discussions](https://github.com/SvetlovA/static-mock/discussions)
+2. **Search Issues**: Check [GitHub Issues](https://github.com/svtlv/static-mock/issues) for similar problems
+3. **Community Support**: Ask in [GitHub Discussions](https://github.com/svtlv/static-mock/discussions)
 4. **Create Issue**: If you find a bug, create a detailed issue with:
    - Source and target versions
    - Minimal reproduction code
@@ -157,7 +157,7 @@ This migration guide should help you smoothly transition between SMock versions 
 
 The migration examples shown in this guide are based on actual working test cases. You can find complete, debugged migration examples in the SMock test suite:
 
-- **[Migration Examples](https://github.com/SvetlovA/static-mock/blob/master/src/StaticMock.Tests/Tests/Examples/MigrationGuide/MigrationExamples.cs)** - `src/StaticMock.Tests/Tests/Examples/MigrationGuide/MigrationExamples.cs`
+- **[Migration Examples](https://github.com/svtlv/static-mock/blob/master/src/StaticMock.Tests/Tests/Examples/MigrationGuide/MigrationExamples.cs)** - `src/StaticMock.Tests/Tests/Examples/MigrationGuide/MigrationExamples.cs`
 
 These examples demonstrate:
 - **Current working syntax** - All examples compile and pass tests with the latest SMock version

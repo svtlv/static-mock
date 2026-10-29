@@ -4,13 +4,13 @@
     <TargetFrameworks>netstandard2.0;net462;net47;net471;net472;net48;net481</TargetFrameworks>
     <Platforms>AnyCPU;x86;x64;</Platforms>
     <PackageId>SMock</PackageId>
-    <Authors>SvetlovA</Authors>
+    <Authors>svtlv</Authors>
     <Product>SMock</Product>
     <Description>SMock is opensource lib for mocking static and instance methods and properties.</Description>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageProjectUrl>https://svetlova.github.io/static-mock</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/SvetlovA/static-mock</RepositoryUrl>
+    <PackageProjectUrl>https://svtlv.github.io/static-mock</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/svtlv/static-mock</RepositoryUrl>
     <PackageTags>mock moq static unit test tests smock</PackageTags>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Copyright>Copyright (c) 2021-present Artem Svetlov</Copyright>

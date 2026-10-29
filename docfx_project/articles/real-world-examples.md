@@ -968,7 +968,7 @@ This comprehensive guide demonstrates how SMock enables testing of complex, real
 
 The real-world examples shown in this guide are based on actual working test cases. You can find complete, debugged examples in the SMock test suite:
 
-- **[Enterprise Scenarios](https://github.com/SvetlovA/static-mock/blob/master/src/StaticMock.Tests/Tests/Examples/RealWorldExamples/EnterpriseScenarios.cs)** - `src/StaticMock.Tests/Tests/Examples/RealWorldExamples/EnterpriseScenarios.cs`
+- **[Enterprise Scenarios](https://github.com/svtlv/static-mock/blob/master/src/StaticMock.Tests/Tests/Examples/RealWorldExamples/EnterpriseScenarios.cs)** - `src/StaticMock.Tests/Tests/Examples/RealWorldExamples/EnterpriseScenarios.cs`
 
 These examples demonstrate:
 - **Financial trading system** - Risk calculation with market data mocking and compliance validation

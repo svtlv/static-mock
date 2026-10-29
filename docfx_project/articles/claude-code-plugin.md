@@ -7,7 +7,7 @@ SMock ships a **Claude Code plugin** that teaches Claude how to write and mainta
 From inside any project open in Claude Code:
 
 ```
-/plugins install github:SvetlovA/static-mock
+/plugins install github:svtlv/static-mock
 ```
 
 Or load for a single session only:

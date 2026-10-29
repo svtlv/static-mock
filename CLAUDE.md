@@ -142,7 +142,7 @@ When adding new features, ensure compatibility across all target frameworks by c
 
 API documentation is generated using DocFX:
 - Configuration: `docfx_project/docfx.json`
-- Published to: https://svetlova.github.io/static-mock/
+- Published to: https://svtlv.github.io/static-mock/
 
 To work with documentation locally, use the DocFX toolchain in the `docfx_project/` directory.
 
@@ -151,7 +151,7 @@ To work with documentation locally, use the DocFX toolchain in the `docfx_projec
 A Claude Code plugin lives in `smock-plugin/` and is installable from any project via:
 
 ```
-/plugins install github:SvetlovA/static-mock
+/plugins install github:svtlv/static-mock
 ```
 
 Then invoke with `/smock-plugin:smock-tests [sequential|hierarchical]` to scaffold or update tests using SMock. The skill discovers the existing test structure, writes tests, updates the project's CLAUDE.md, and validates compilation.

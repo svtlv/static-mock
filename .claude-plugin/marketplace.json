@@ -1,7 +1,7 @@
 {
-  "name": "SvetlovA-static-mock",
+  "name": "svtlv-static-mock",
   "owner": {
-    "name": "SvetlovA"
+    "name": "svtlv"
   },
   "plugins": [
     {

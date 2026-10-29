@@ -697,7 +697,7 @@ public void Test_With_Proper_Cleanup()
 When you encounter issues:
 
 1. **Check the Documentation**: Review this guide and the [API reference](../api/index.md)
-2. **Search Issues**: Check [GitHub Issues](https://github.com/SvetlovA/static-mock/issues) for similar problems
+2. **Search Issues**: Check [GitHub Issues](https://github.com/svtlv/static-mock/issues) for similar problems
 3. **Create Minimal Repro**: Prepare a minimal code example that demonstrates the issue
 4. **Ask for Help**: Create a new issue with details about your environment and problem
 
@@ -724,7 +724,7 @@ Now that you understand the basics of SMock, continue your journey with these co
 
 ### 📚 **Reference Materials**
 - **[API Reference](../api/index.md)** - Complete API documentation with detailed method signatures
-- **[GitHub Repository](https://github.com/SvetlovA/static-mock)** - Source code, issue tracking, and community discussions
+- **[GitHub Repository](https://github.com/svtlv/static-mock)** - Source code, issue tracking, and community discussions
 - **[NuGet Package](https://www.nuget.org/packages/SMock)** - Latest releases and version history
 
 ### 💡 **Quick Navigation by Use Case**
@@ -741,18 +741,18 @@ Happy testing with SMock! 🚀
 All examples in this documentation are based on actual working test cases. You can find complete, debugged examples in the SMock test suite:
 
 ### 📁 **Basic Examples**
-- **[Basic Sequential Examples](https://github.com/SvetlovA/static-mock/blob/master/src/StaticMock.Tests/Tests/Examples/GettingStarted/BasicSequentialExamples.cs)** - `src/StaticMock.Tests/Tests/Examples/GettingStarted/BasicSequentialExamples.cs`
-- **[Basic Hierarchical Examples](https://github.com/SvetlovA/static-mock/blob/master/src/StaticMock.Tests/Tests/Examples/GettingStarted/BasicHierarchicalExamples.cs)** - `src/StaticMock.Tests/Tests/Examples/GettingStarted/BasicHierarchicalExamples.cs`
-- **[Async Examples](https://github.com/SvetlovA/static-mock/blob/master/src/StaticMock.Tests/Tests/Examples/GettingStarted/AsyncExamples.cs)** - `src/StaticMock.Tests/Tests/Examples/GettingStarted/AsyncExamples.cs`
+- **[Basic Sequential Examples](https://github.com/svtlv/static-mock/blob/master/src/StaticMock.Tests/Tests/Examples/GettingStarted/BasicSequentialExamples.cs)** - `src/StaticMock.Tests/Tests/Examples/GettingStarted/BasicSequentialExamples.cs`
+- **[Basic Hierarchical Examples](https://github.com/svtlv/static-mock/blob/master/src/StaticMock.Tests/Tests/Examples/GettingStarted/BasicHierarchicalExamples.cs)** - `src/StaticMock.Tests/Tests/Examples/GettingStarted/BasicHierarchicalExamples.cs`
+- **[Async Examples](https://github.com/svtlv/static-mock/blob/master/src/StaticMock.Tests/Tests/Examples/GettingStarted/AsyncExamples.cs)** - `src/StaticMock.Tests/Tests/Examples/GettingStarted/AsyncExamples.cs`
 
 ### 📁 **Advanced Examples**
-- **[Complex Mock Scenarios](https://github.com/SvetlovA/static-mock/blob/master/src/StaticMock.Tests/Tests/Examples/AdvancedPatterns/ComplexMockScenarios.cs)** - `src/StaticMock.Tests/Tests/Examples/AdvancedPatterns/ComplexMockScenarios.cs`
-- **[Benchmark Project](https://github.com/SvetlovA/static-mock/tree/master/src/StaticMock.Tests.Benchmark)** - `src/StaticMock.Tests.Benchmark/` — run with `dotnet run --project src/StaticMock.Tests.Benchmark --configuration Release`
-- **[Real-World Enterprise Scenarios](https://github.com/SvetlovA/static-mock/blob/master/src/StaticMock.Tests/Tests/Examples/RealWorldExamples/EnterpriseScenarios.cs)** - `src/StaticMock.Tests/Tests/Examples/RealWorldExamples/EnterpriseScenarios.cs`
+- **[Complex Mock Scenarios](https://github.com/svtlv/static-mock/blob/master/src/StaticMock.Tests/Tests/Examples/AdvancedPatterns/ComplexMockScenarios.cs)** - `src/StaticMock.Tests/Tests/Examples/AdvancedPatterns/ComplexMockScenarios.cs`
+- **[Benchmark Project](https://github.com/svtlv/static-mock/tree/master/src/StaticMock.Tests.Benchmark)** - `src/StaticMock.Tests.Benchmark/` — run with `dotnet run --project src/StaticMock.Tests.Benchmark --configuration Release`
+- **[Real-World Enterprise Scenarios](https://github.com/svtlv/static-mock/blob/master/src/StaticMock.Tests/Tests/Examples/RealWorldExamples/EnterpriseScenarios.cs)** - `src/StaticMock.Tests/Tests/Examples/RealWorldExamples/EnterpriseScenarios.cs`
 
 ### 📁 **Migration & Integration**
-- **[Migration Examples](https://github.com/SvetlovA/static-mock/blob/master/src/StaticMock.Tests/Tests/Examples/MigrationGuide/MigrationExamples.cs)** - `src/StaticMock.Tests/Tests/Examples/MigrationGuide/MigrationExamples.cs`
-- **[Framework Integration Tests](https://github.com/SvetlovA/static-mock/blob/master/src/StaticMock.Tests/Tests/Examples/FrameworkIntegration/NUnitIntegrationTests.cs)** - `src/StaticMock.Tests/Tests/Examples/FrameworkIntegration/NUnitIntegrationTests.cs`
+- **[Migration Examples](https://github.com/svtlv/static-mock/blob/master/src/StaticMock.Tests/Tests/Examples/MigrationGuide/MigrationExamples.cs)** - `src/StaticMock.Tests/Tests/Examples/MigrationGuide/MigrationExamples.cs`
+- **[Framework Integration Tests](https://github.com/svtlv/static-mock/blob/master/src/StaticMock.Tests/Tests/Examples/FrameworkIntegration/NUnitIntegrationTests.cs)** - `src/StaticMock.Tests/Tests/Examples/FrameworkIntegration/NUnitIntegrationTests.cs`
 
 ### 💡 **Why Reference the Test Examples?**
 
@@ -769,7 +769,7 @@ To run these examples on your machine:
 
 ```bash
 # Clone the repository
-git clone https://github.com/SvetlovA/static-mock.git
+git clone https://github.com/svtlv/static-mock.git
 cd static-mock/src
 
 # Run the specific example tests
