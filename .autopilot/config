@@ -1,0 +1,3 @@
+[review]
+# Codex reviews each plan draft read-only
+plan = auto
