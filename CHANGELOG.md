@@ -8,21 +8,39 @@ the latest SMock tag are listed under `Unreleased`.
 
 ## Unreleased
 
+## v2.7.0-preview.1 - 2026-11-25
+
+SMock 2.7.0-preview.1 is a prerelease. It depends on the MonoMod prereleases (`MonoMod.Core 1.4.0-prerelease.3`) for .NET 11 support, because MonoMod has no stable release with a `net11.0` target yet. A stable SMock 2.7.0 follows when MonoMod ships stable versions.
+
 ### New Features
 
+- Add the `net11.0` target to the SMock package.
+- Hook runtime-async methods that return `Task`, `Task<T>`, `ValueTask` and `ValueTask<T>` on .NET 11, in the sequential and hierarchical API styles, through the async detour support of MonoMod.Core 1.4. New tests prove interception from normal and runtime-async callers, and for original calls that are suspended when the mock is installed.
 - Add the SMock Tests Claude Code plugin and usage references.
 - Release SMock to NuGet, GitHub Packages, and GitHub Releases when a version tag is pushed, with changelog notes and package checksums.
 
 ### Improved
 
+- Update MonoMod to `MonoMod.Core 1.4.0-prerelease.3` for every target. The .NET Framework targets now use the same `DetourFactory` hook code as the other targets, and the `MonoMod.RuntimeDetour` dependency is removed.
+- Update the test packages: NUnit 5.0.0, NUnit3TestAdapter 6.3.1, Microsoft.NET.Test.Sdk 18.12.0, Microsoft.Extensions.Configuration.Binder and Json 11.0.0, and BenchmarkDotNet 0.15.8.
+- Migrate the tests to NUnit 5: the async throws assertions are awaited, and the hierarchical tests keep the validation synchronous.
+- Modernize the code with C# 14/15 features (primary constructors, collection expressions, `is null` patterns, switch expressions, file-scoped namespaces) for all targets, and use .NET 11 APIs only in the `net11.0` build. The hook code is logically unchanged, and there is no public API change.
+- Remove .NET 8 and .NET 9 from the test targets, because both are out of Microsoft support. The tests now run on .NET 10, .NET 11 and .NET Framework 4.6.2 to 4.8.1.
+- Update the CI workflows for the .NET 10 and .NET 11 SDKs, and add pull request checks for the documentation build and the release metadata.
+- Update the documentation for .NET 10 and .NET 11, the prerelease install commands and the 2.7.0-preview.1 migration notes.
 - Clarify context-based argument matching, advanced patterns, and troubleshooting documentation.
 - Refresh CI actions and use the Intel macOS runner for x86_64 tests.
 
 ### Fixed
 
+- Correct the hierarchical async example in the documentation: the validation `Action` must be synchronous and must finish while the hook is active.
 - Include the license and README in the NuGet package using the correct paths.
 - Fail the release gate when any Unix test framework fails.
 - Replace the manual publishing workflows with a single tested tag-based release pipeline.
+
+### Known limitations
+
+- On the .NET 11 runtime, SMock cannot mock generic method instantiations that return `Task`, `Task<T>`, `ValueTask` or `ValueTask<T>` (for example `Task.FromResult<int>`), because MonoMod.Core 1.4.0-prerelease.3 does not support them yet. SMock throws a `NotSupportedException` with a clear message and keeps the MonoMod exception as `InnerException`. Non-generic async methods and all other target frameworks work.
 
 ## v2.6.0 - 2025-11-27
 
@@ -219,7 +237,8 @@ the latest SMock tag are listed under `Unreleased`.
 
 ## Release comparisons
 
-- [Unreleased](https://github.com/svtlv/static-mock/compare/v2.6.0...HEAD)
+- [Unreleased](https://github.com/svtlv/static-mock/compare/v2.7.0-preview.1...HEAD)
+- [v2.7.0-preview.1](https://github.com/svtlv/static-mock/compare/v2.6.0...v2.7.0-preview.1)
 - [v2.6.0](https://github.com/svtlv/static-mock/compare/v2.5.0...v2.6.0)
 - [v2.5.0](https://github.com/svtlv/static-mock/compare/v2.4.0...v2.5.0)
 - [v2.4.0](https://github.com/svtlv/static-mock/compare/v2.3.0...v2.4.0)
