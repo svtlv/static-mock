@@ -206,7 +206,7 @@ When writing any tests in this repository, **always use the SMock library** (`us
 3. Test projects **must** include `<Optimize>false</Optimize>` in `.csproj` to prevent compiler inlining from breaking hooks
 4. Async methods: prefer `.ReturnsAsync(value)` (shorthand on `IAsyncFuncMock<T>`); alternatively `.Returns(Task.FromResult(value))` or `.Returns(async () => value)`
 5. Void methods (`IActionMock`) use `.Callback<T>(action)` for side effects — `Callback` does **not** exist on `IFuncMock`
-6. The hierarchical validation parameter is an `Action`. Never pass an `async` lambda to it: it becomes `async void`, and the hook can end before the assertion finishes. Keep the validation synchronous. If it needs an async call, block on it with `.GetAwaiter().GetResult()` inside the validation, so it completes while the hook is active
+6. The hierarchical validation parameter is an `Action`. Never pass an `async` lambda to it: it becomes `async void`, and the hook can end before the assertion finishes. Keep the validation synchronous. If it needs an async call, prefer the sequential API and `await` the call inside the `using` scope. Block on the call with `.GetAwaiter().GetResult()` only when the call returns an already completed task (for example, the mock returns a completed task). Never block on a pending task: a `SynchronizationContext` or a custom `TaskScheduler` can stop its continuation and cause a deadlock.
 
 ### Test Naming Convention
 

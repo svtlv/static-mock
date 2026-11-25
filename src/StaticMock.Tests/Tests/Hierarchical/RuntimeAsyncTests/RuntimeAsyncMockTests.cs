@@ -35,6 +35,7 @@ public class RuntimeAsyncMockTests
         Assert.That(calls, Is.EqualTo(1));
 
         await TestRuntimeAsyncClass.TestMethodReturnTaskAsync();
+        Assert.That(calls, Is.EqualTo(1), "The mock must not run after its scope ends");
     }
 
     [Test]
@@ -64,6 +65,7 @@ public class RuntimeAsyncMockTests
         Assert.That(calls, Is.EqualTo(1));
 
         await TestRuntimeAsyncClass.TestCallerAwaitsTaskAsync();
+        Assert.That(calls, Is.EqualTo(1), "The mock must not run after its scope ends");
     }
 
     [Test]
@@ -161,6 +163,7 @@ public class RuntimeAsyncMockTests
         Assert.That(calls, Is.EqualTo(1));
 
         await TestRuntimeAsyncClass.TestMethodReturnValueTaskAsync();
+        Assert.That(calls, Is.EqualTo(1), "The mock must not run after its scope ends");
     }
 
     [Test]
@@ -190,6 +193,7 @@ public class RuntimeAsyncMockTests
         Assert.That(calls, Is.EqualTo(1));
 
         await TestRuntimeAsyncClass.TestCallerAwaitsValueTaskAsync();
+        Assert.That(calls, Is.EqualTo(1), "The mock must not run after its scope ends");
     }
 
     [Test]
@@ -325,34 +329,50 @@ public class RuntimeAsyncMockTests
     [Test]
     public async Task TestStaticCallbackAsyncVoidMethod()
     {
+        var calls = 0;
+
         Mock.Setup(context => TestRuntimeAsyncClass.TestVoidMethodAsync(context.It.IsAny<TaskCompletionSource>()), () =>
         {
             var completion = new TaskCompletionSource();
             TestRuntimeAsyncClass.TestVoidMethodAsync(completion);
 
-            Assert.That(completion.Task.IsCompleted, Is.True, "The callback must run instead of the original method, which suspends first");
-        }).Callback<TaskCompletionSource>(source => source.SetResult());
+            Assert.That(calls, Is.EqualTo(1), "The callback must run instead of the original method");
+            Assert.That(completion.Task.IsCompleted, Is.True, "The callback must complete the task before the original method, which suspends first, could");
+        }).Callback<TaskCompletionSource>(source =>
+        {
+            calls++;
+            source.SetResult();
+        });
 
         var originalCompletion = new TaskCompletionSource();
         TestRuntimeAsyncClass.TestVoidMethodAsync(originalCompletion);
         await originalCompletion.Task;
+        Assert.That(calls, Is.EqualTo(1), "The mock must not run after its scope ends");
     }
 
     [Test]
     public async Task TestStaticCallbackAsyncVoidMethodWithParameter()
     {
+        var calls = 0;
+
         Mock.Setup(context => TestRuntimeAsyncClass.TestVoidMethodWithParameterAsync(context.It.IsAny<int>(), context.It.IsAny<TaskCompletionSource<int>>()), () =>
         {
             var completion = new TaskCompletionSource<int>();
             TestRuntimeAsyncClass.TestVoidMethodWithParameterAsync(4, completion);
 
-            Assert.That(completion.Task.IsCompleted, Is.True, "The callback must run instead of the original method, which suspends first");
+            Assert.That(calls, Is.EqualTo(1), "The callback must run instead of the original method");
+            Assert.That(completion.Task.IsCompleted, Is.True, "The callback must complete the task before the original method, which suspends first, could");
             Assert.That(completion.Task.GetAwaiter().GetResult(), Is.EqualTo(40));
-        }).Callback<int, TaskCompletionSource<int>>((parameter, source) => source.SetResult(parameter * 10));
+        }).Callback<int, TaskCompletionSource<int>>((parameter, source) =>
+        {
+            calls++;
+            source.SetResult(parameter * 10);
+        });
 
         var originalCompletion = new TaskCompletionSource<int>();
         TestRuntimeAsyncClass.TestVoidMethodWithParameterAsync(4, originalCompletion);
         Assert.That(await originalCompletion.Task, Is.EqualTo(4));
+        Assert.That(calls, Is.EqualTo(1), "The mock must not run after its scope ends");
     }
 
     // ---- Instance methods: TestRuntimeAsyncInstance ----
@@ -374,6 +394,7 @@ public class RuntimeAsyncMockTests
         Assert.That(calls, Is.EqualTo(1));
 
         await instance.TestMethodReturnTaskAsync();
+        Assert.That(calls, Is.EqualTo(1), "The mock must not run after its scope ends");
     }
 
     [Test]
@@ -405,6 +426,7 @@ public class RuntimeAsyncMockTests
         Assert.That(calls, Is.EqualTo(1));
 
         await instance.TestCallerAwaitsTaskAsync();
+        Assert.That(calls, Is.EqualTo(1), "The mock must not run after its scope ends");
     }
 
     [Test]
@@ -508,6 +530,7 @@ public class RuntimeAsyncMockTests
         Assert.That(calls, Is.EqualTo(1));
 
         await instance.TestMethodReturnValueTaskAsync();
+        Assert.That(calls, Is.EqualTo(1), "The mock must not run after its scope ends");
     }
 
     [Test]
@@ -539,6 +562,7 @@ public class RuntimeAsyncMockTests
         Assert.That(calls, Is.EqualTo(1));
 
         await instance.TestCallerAwaitsValueTaskAsync();
+        Assert.That(calls, Is.EqualTo(1), "The mock must not run after its scope ends");
     }
 
     [Test]
@@ -684,35 +708,51 @@ public class RuntimeAsyncMockTests
     public async Task TestInstanceCallbackAsyncVoidMethod()
     {
         var instance = new TestRuntimeAsyncInstance();
+        var calls = 0;
+
         Mock.Setup(context => instance.TestVoidMethodAsync(context.It.IsAny<TaskCompletionSource>()), () =>
         {
             var completion = new TaskCompletionSource();
             instance.TestVoidMethodAsync(completion);
 
-            Assert.That(completion.Task.IsCompleted, Is.True, "The callback must run instead of the original method, which suspends first");
-        }).Callback<TaskCompletionSource>(source => source.SetResult());
+            Assert.That(calls, Is.EqualTo(1), "The callback must run instead of the original method");
+            Assert.That(completion.Task.IsCompleted, Is.True, "The callback must complete the task before the original method, which suspends first, could");
+        }).Callback<TaskCompletionSource>(source =>
+        {
+            calls++;
+            source.SetResult();
+        });
 
         var originalCompletion = new TaskCompletionSource();
         instance.TestVoidMethodAsync(originalCompletion);
         await originalCompletion.Task;
+        Assert.That(calls, Is.EqualTo(1), "The mock must not run after its scope ends");
     }
 
     [Test]
     public async Task TestInstanceCallbackAsyncVoidMethodWithParameter()
     {
         var instance = new TestRuntimeAsyncInstance();
+        var calls = 0;
+
         Mock.Setup(context => instance.TestVoidMethodWithParameterAsync(context.It.IsAny<int>(), context.It.IsAny<TaskCompletionSource<int>>()), () =>
         {
             var completion = new TaskCompletionSource<int>();
             instance.TestVoidMethodWithParameterAsync(4, completion);
 
-            Assert.That(completion.Task.IsCompleted, Is.True, "The callback must run instead of the original method, which suspends first");
+            Assert.That(calls, Is.EqualTo(1), "The callback must run instead of the original method");
+            Assert.That(completion.Task.IsCompleted, Is.True, "The callback must complete the task before the original method, which suspends first, could");
             Assert.That(completion.Task.GetAwaiter().GetResult(), Is.EqualTo(40));
-        }).Callback<int, TaskCompletionSource<int>>((parameter, source) => source.SetResult(parameter * 10));
+        }).Callback<int, TaskCompletionSource<int>>((parameter, source) =>
+        {
+            calls++;
+            source.SetResult(parameter * 10);
+        });
 
         var originalCompletion = new TaskCompletionSource<int>();
         instance.TestVoidMethodWithParameterAsync(4, originalCompletion);
         Assert.That(await originalCompletion.Task, Is.EqualTo(4));
+        Assert.That(calls, Is.EqualTo(1), "The mock must not run after its scope ends");
     }
 }
 #endif

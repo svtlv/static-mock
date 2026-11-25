@@ -6,7 +6,9 @@ namespace StaticMock.Tests.Tests.Hierarchical.ValidationTests;
 /// <summary>
 /// The validation parameter of the hierarchical <c>Mock.Setup</c> is an <see cref="Action"/>.
 /// An <c>async</c> lambda here becomes <c>async void</c>: the hook can end before the assertion finishes.
-/// These tests show the safe pattern: keep the validation synchronous and block on async work inside it.
+/// These tests show that the validation stays synchronous and ends before the hook ends. They block on pending
+/// tasks only because NUnit runs them without a SynchronizationContext and on the default TaskScheduler.
+/// Application code must not do this: prefer the sequential API and await the call.
 /// </summary>
 [TestFixture]
 public class HierarchicalAsyncValidationTests

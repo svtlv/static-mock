@@ -439,7 +439,7 @@ To work around the limitation, mock a non-generic method (for example a wrapper 
 
 #### Hierarchical validation must stay synchronous
 
-The validation parameter of the hierarchical `Mock.Setup` is an `Action`. Do not pass an `async` lambda to it: the lambda becomes `async void`, and the hook can end before the assertion finishes. Block on the async call inside the validation, for example with `.GetAwaiter().GetResult()`, so the assertion completes while the hook is active.
+The validation parameter of the hierarchical `Mock.Setup` is an `Action`. Do not pass an `async` lambda to it: the lambda becomes `async void`, and the hook can end before the assertion finishes. If the validation needs an async call, prefer the sequential API and `await` the call inside the `using` scope. Block on the call with `.GetAwaiter().GetResult()` only when the call returns an already completed task (for example, the mock returns a completed task). Never block on a pending task: a `SynchronizationContext` or a custom `TaskScheduler` can stop its continuation and cause a deadlock.
 
 ## Runtime Issues
 

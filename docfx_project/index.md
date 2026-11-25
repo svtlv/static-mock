@@ -182,7 +182,8 @@ using var mock = Mock.Setup(() => HttpClient.GetStringAsync("https://api.example
 // because it becomes async void and the hook can end before the assertion runs.
 Mock.Setup(context => DatabaseService.GetUserAsync(context.It.IsAny<int>()), () =>
 {
-    // Block on the call so the assertion finishes while the hook is active
+    // Blocking is safe here: the mock returns a completed task. For a call that needs
+    // the calling thread, use the sequential API and await instead.
     var user = DatabaseService.GetUserAsync(123).GetAwaiter().GetResult();
     Assert.IsNotNull(user);
 }).Returns(Task.FromResult(new User { Id = 123, Name = "Test" }));

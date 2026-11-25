@@ -60,7 +60,7 @@ void Mock.SetupDefault(Type type, string methodName);
 
 Accepts a validation `Action` that executes during the mock call. No disposal needed.
 
-The validation is synchronous. Never pass an `async` lambda: it becomes `async void`, and the hook can end before the assertion finishes. If the validation needs an async call, block on it with `.GetAwaiter().GetResult()`.
+The validation is synchronous. Never pass an `async` lambda: it becomes `async void`, and the hook can end before the assertion finishes. If the validation needs an async call, prefer the sequential API and `await` the call inside the `using` scope. Block with `.GetAwaiter().GetResult()` only when the call returns an already completed task (for example, the mock returns a completed task). Never block on a pending task: a `SynchronizationContext` or a custom `TaskScheduler` can stop its continuation and cause a deadlock.
 
 ```csharp
 // Func with validation

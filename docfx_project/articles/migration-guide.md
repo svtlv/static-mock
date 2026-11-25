@@ -60,7 +60,7 @@ On the .NET 11 runtime, SMock cannot mock generic method instantiations that ret
 
 #### Keep hierarchical validation synchronous
 
-The validation parameter of the hierarchical `Mock.Setup` is an `Action`. Do not pass an `async` lambda to it: it becomes `async void`, and the hook can end before the assertion finishes. Block on the async call inside the validation (for example with `.GetAwaiter().GetResult()`).
+The validation parameter of the hierarchical `Mock.Setup` is an `Action`. Do not pass an `async` lambda to it: it becomes `async void`, and the hook can end before the assertion finishes. If the validation needs an async call, prefer the sequential API and `await` the call inside the `using` scope. Block with `.GetAwaiter().GetResult()` only when the call returns an already completed task (for example, the mock returns a completed task). Never block on a pending task: a `SynchronizationContext` or a custom `TaskScheduler` can stop its continuation and cause a deadlock.
 
 #### If you use NUnit
 
