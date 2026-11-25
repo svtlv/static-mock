@@ -70,7 +70,7 @@ missing or expired credentials before retrying. Never move a published tag or
 reuse a published version for changed package contents.
 
 The release workflow also supports manual dispatch against an existing version
-tag (for example, `gh workflow run release.yaml --ref v2.7.0`); branch dispatches
+tag (for example, `gh workflow run release.yaml --ref v2.7.0-preview.1`); branch dispatches
 are rejected. Prefer rerunning failed jobs to retain the original package
 artifact. Do not dispatch an already completed release: its GitHub release
 already exists. Code or changelog corrections after publication need a new version.
