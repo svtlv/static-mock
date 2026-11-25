@@ -16,7 +16,7 @@ SMock is designed with performance in mind, utilizing efficient runtime IL modif
 
 ### Key Performance Metrics by Framework
 
-#### Modern .NET (.NET 8.0/9.0/10.0)
+#### Modern .NET (.NET 10.0)
 
 | Operation | Mean Time | Memory Allocation | Notes |
 |-----------|-----------|-------------------|--------|
@@ -28,6 +28,8 @@ SMock is designed with performance in mind, utilizing efficient runtime IL modif
 | Parameter Matching (IsAny) | 8,100-8,600 μs | 18-22 KB | Dynamic parameter matching |
 | Callback Operations | 950-2,670 μs | 16-21 KB | Depends on callback complexity |
 | Async Method Mocking | 1,750-2,300 μs | 7-20 KB | Task-based operations |
+
+> **Note**: These numbers come from earlier BenchmarkDotNet runs on modern .NET. .NET 8 and .NET 9 are out of support and are no longer benchmark targets. **.NET 11 numbers are pending**: run `dotnet run --project StaticMock.Tests.Benchmark --framework net11.0 --configuration Release` from the `src` folder and add the results here.
 
 #### .NET Framework (4.6.2 - 4.8.1)
 
@@ -60,9 +62,8 @@ To run all benchmarks across supported frameworks:
 ```bash
 cd src
 # Modern .NET versions
-dotnet run --project StaticMock.Tests.Benchmark --framework net8.0
-dotnet run --project StaticMock.Tests.Benchmark --framework net9.0
 dotnet run --project StaticMock.Tests.Benchmark --framework net10.0
+dotnet run --project StaticMock.Tests.Benchmark --framework net11.0
 
 # .NET Framework versions
 dotnet run --project StaticMock.Tests.Benchmark --framework net462
@@ -96,17 +97,17 @@ The benchmark project includes 24+ performance tests covering all major SMock fu
 
 ### Framework Performance Comparison
 
-Based on comprehensive benchmarking across .NET 8.0/9.0/10.0 and .NET Framework 4.6.2-4.8.1:
+Based on comprehensive benchmarking across modern .NET (.NET 10.0; .NET 11 results are pending) and .NET Framework 4.6.2-4.8.1:
 
 #### Performance Highlights
-- **Best Overall Performance**: Modern .NET (8.0/9.0/10.0) for most operations
+- **Best Overall Performance**: Modern .NET (.NET 10 and later) for most operations
 - **Parameter Matching Exception**: .NET Framework performs better with `IsAny<T>()` (4ms vs 8ms)
 - **Instance Mocking Cost**: Significantly higher on .NET Framework (109-118ms setup vs 1ms)
 - **Memory Efficiency**: Modern .NET uses ~10x less memory (6-31KB vs 104-304KB)
 - **Framework Consistency**: All .NET Framework versions (4.6.2-4.8.1) show nearly identical performance
 
 #### Recommended Framework Selection
-- **Modern .NET (.NET 8+)**: Best for new projects requiring optimal performance
+- **Modern .NET (.NET 10+)**: Best for new projects requiring optimal performance
 - **.NET Framework (any version 4.6.2+)**: Acceptable for legacy projects, with parameter matching advantages
 - **Version Agnostic**: Performance is consistent across all .NET Framework versions tested
 
@@ -211,32 +212,35 @@ The benchmark project can be configured with different options:
 var config = DefaultConfig.Instance
     .AddDiagnoser(MemoryDiagnoser.Default)
     .AddDiagnoser(DisassemblyDiagnoser.Create(DisassemblyDiagnoserConfig.Asm))
-    .AddJob(Job.Default.WithRuntime(CoreRuntime.Core80))
-    .AddJob(Job.Default.WithRuntime(CoreRuntime.Core90));
+    .AddJob(Job.Default.WithRuntime(CoreRuntime.Core10_0))
+    // BenchmarkDotNet 0.15.8 has no named constant for .NET 11, so create the runtime by moniker
+    .AddJob(Job.Default.WithRuntime(CoreRuntime.CreateForNewVersion("net11.0", ".NET 11.0")));
 
 BenchmarkRunner.Run<TestBenchmarks>(config);
 ```
 
 ### Detailed Benchmark Results
 
-#### .NET 8.0/9.0/10.0 Performance Matrix
+#### .NET 10.0 Performance Matrix
 
-| Benchmark | .NET 8.0 (μs) | .NET 9.0 (μs) | .NET 10.0 (μs) | Memory (KB) |
-|-----------|---------------|---------------|----------------|-------------|
-| SequentialMock_Setup_StaticMethodWithReturn | 547,000 | 534,000 | 562,000 | 6.1-6.2 |
-| SequentialMock_Execution_StaticMethodWithReturn | 707 | 694 | 792 | 7.7-10.4 |
-| ParameterMatching_ExactMatch | 1,348 | 1,360 | 1,329 | 8.1-10.8 |
-| ParameterMatching_IsAny | 8,592 | 8,131 | 8,270 | 18.6-21.6 |
-| ParameterMatching_Conditional | 1,717 | 1,695 | 1,641 | 19.5-22.2 |
-| MockWithSimpleCallback | 2,646 | 2,570 | 2,664 | 16.7-20.9 |
-| MockWithComplexCallback | 944 | 1,090 | 976 | 16.8-21.1 |
-| AsyncMock_Setup_TaskMethod | 2,161 | 2,300 | 2,184 | 7.1-10.7 |
-| AsyncMock_Setup_TaskWithReturn | 1,758 | 1,814 | 1,825 | 8.3-11.0 |
-| MultipleMocks_Setup_ThreeMocks | 1,430 | 1,518 | 1,441 | 27.4-31.6 |
-| MultipleMocks_Execution_ThreeMocks | 1,260 | 1,265 | 1,386 | 28.3-31.6 |
-| StaticMock_Setup | 594 | 731 | 630 | 7.7-10.4 |
-| StaticMock_Execution | 586 | 713 | 606 | 7.7-10.4 |
-| MemoryIntensive_SetupAndDispose_100Times | 9,419 | 9,160 | 9,875 | 565-571 |
+| Benchmark | .NET 10.0 (μs) | Memory (KB) |
+|-----------|----------------|-------------|
+| SequentialMock_Setup_StaticMethodWithReturn | 562,000 | 6.1-6.2 |
+| SequentialMock_Execution_StaticMethodWithReturn | 792 | 7.7-10.4 |
+| ParameterMatching_ExactMatch | 1,329 | 8.1-10.8 |
+| ParameterMatching_IsAny | 8,270 | 18.6-21.6 |
+| ParameterMatching_Conditional | 1,641 | 19.5-22.2 |
+| MockWithSimpleCallback | 2,664 | 16.7-20.9 |
+| MockWithComplexCallback | 976 | 16.8-21.1 |
+| AsyncMock_Setup_TaskMethod | 2,184 | 7.1-10.7 |
+| AsyncMock_Setup_TaskWithReturn | 1,825 | 8.3-11.0 |
+| MultipleMocks_Setup_ThreeMocks | 1,441 | 27.4-31.6 |
+| MultipleMocks_Execution_ThreeMocks | 1,386 | 28.3-31.6 |
+| StaticMock_Setup | 630 | 7.7-10.4 |
+| StaticMock_Execution | 606 | 7.7-10.4 |
+| MemoryIntensive_SetupAndDispose_100Times | 9,875 | 565-571 |
+
+> **Note**: The memory column is a range from earlier runs on several modern .NET versions. .NET 11 results are pending: run the `net11.0` benchmark and add a column.
 
 #### Complete .NET Framework Performance Matrix (4.6.2 - 4.8.1)
 
@@ -289,7 +293,7 @@ SMock follows a **high setup cost, low execution cost** model:
 
 | Framework | Typical Allocation | Peak Usage | GC Pressure |
 |-----------|-------------------|------------|-------------|
-| .NET 8.0/9.0/10.0 | 6-31 KB | 571 KB (100 mocks) | Low |
+| .NET 10.0 | 6-31 KB | 571 KB (100 mocks) | Low |
 | .NET Framework 4.8+ | 104-304 KB | 2+ MB (100 mocks) | Medium |
 
 ### Scaling Characteristics
@@ -351,7 +355,7 @@ Mock.Setup(() => myInstance.GetCurrentTime())
 
 ### 3. Framework Selection Strategy
 
-**Choose Modern .NET (.NET 8+) for**:
+**Choose Modern .NET (.NET 10+) for**:
 - New projects requiring optimal memory usage
 - High-frequency test execution
 - CI/CD pipelines with memory constraints

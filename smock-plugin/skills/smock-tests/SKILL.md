@@ -307,7 +307,7 @@ cd src
 dotnet build --configuration Debug
 
 # Run the tests for the affected project
-dotnet test --configuration Debug --framework net8.0 --verbosity minimal \
+dotnet test --configuration Debug --framework net10.0 --verbosity minimal \
   --filter "FullyQualifiedName~OriginalProject.Tests"
 ```
 

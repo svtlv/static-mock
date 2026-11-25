@@ -333,13 +333,15 @@ Assert.Throws<FileNotFoundException>(() => File.ReadAllText("missing.txt"));
 ## Platform Compatibility
 
 ### Supported Runtimes
-- .NET 5.0+
-- .NET Core 2.0+
+- .NET 11 (`net11.0`)
+- .NET Standard 2.0 (use it from .NET 10 (LTS) and other compatible runtimes)
 - .NET Framework 4.62-4.81
-- .NET Standard 2.0+
+
+The SMock tests run on .NET 10, .NET 11 and .NET Framework 4.6.2-4.8.1. SMock 2.7.0-preview.1 is a prerelease: it depends on MonoMod prereleases for .NET 11 support.
 
 ### Known Limitations
 - **Generic Methods**: Limited support for open generic methods
+- **Generic Task-like methods on .NET 11**: On the .NET 11 runtime, generic method instantiations that return `Task`, `Task<T>`, `ValueTask` or `ValueTask<T>` (for example `Task.FromResult<int>`) cannot be mocked, because MonoMod.Core 1.4.0-prerelease.3 does not support them yet. SMock throws a clear `NotSupportedException`
 - **Unsafe Code**: Some unsafe method signatures not supported
 - **Native Interop**: P/Invoke methods cannot be mocked
 - **Compiler-Generated**: Some compiler-generated methods may not be hookable

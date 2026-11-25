@@ -9,13 +9,15 @@ SMock is a .NET library for mocking static and instance methods and properties. 
 - **Hierarchical Setup**: Mock setup with validation actions - `Mock.Setup(expression, action).Returns(value)`
 - **Sequential Setup**: Disposable mock setup - `using var _ = Mock.Setup(expression).Returns(value)`
 
-The library targets multiple frameworks: .NET Standard 2.0 and .NET Framework (4.62, 4.7, 4.71, 4.72, 4.8, 4.81), published as the "SMock" NuGet package.
+The library targets multiple frameworks: .NET Standard 2.0, .NET 11 (`net11.0`) and .NET Framework (4.62, 4.7, 4.71, 4.72, 4.8, 4.81), published as the "SMock" NuGet package. The test projects target .NET Framework 4.6.2 to 4.8.1, `net10.0` and `net11.0`. .NET 8 and .NET 9 are out of support and are no longer test targets.
+
+The current version is the prerelease `2.7.0-preview.1`. It depends on the MonoMod prerelease `MonoMod.Core 1.4.0-prerelease.3`, because MonoMod has no stable release with a `net11.0` target yet. A stable SMock `2.7.0` follows when MonoMod is stable.
 
 ## Prerequisites
 
 The development environment requires:
-- .NET 8.0, 9.0, and 10.0 SDKs installed for cross-platform testing
-- All tests run on Windows by default; Unix/macOS testing requires framework-specific commands
+- .NET 10.0 and 11.0 SDKs installed for cross-platform testing
+- All tests run on Windows by default; Unix/macOS testing requires framework-specific commands (macOS and Linux cannot run the .NET Framework tests)
 
 ## Development Commands
 
@@ -34,9 +36,8 @@ dotnet build --configuration Release --no-restore
 dotnet test --no-build --configuration Release --verbosity minimal
 
 # Run tests for specific framework (Unix/macOS)
-dotnet test --framework net8.0 --no-build --configuration Release --verbosity minimal
-dotnet test --framework net9.0 --no-build --configuration Release --verbosity minimal
 dotnet test --framework net10.0 --no-build --configuration Release --verbosity minimal
+dotnet test --framework net11.0 --no-build --configuration Release --verbosity minimal
 
 # Run a single test class
 dotnet test --filter "ClassName=SetupMockReturnsTests"
@@ -117,6 +118,7 @@ pwsh -File scripts/prepare-release.ps1 -Tag vX.Y.Z
 - `TestStaticAsyncClass`: Async static methods
 - `TestInstance`: Instance methods
 - `TestGenericInstance`: Generic type testing
+- `TestRuntimeAsyncClass` / `TestRuntimeAsyncInstance`: runtime-async `Task`, `Task<T>`, `ValueTask` and `ValueTask<T>` methods (only under `#if NET11_0_OR_GREATER`)
 
 ### Running Specific Test Scenarios
 ```bash
@@ -127,16 +129,37 @@ dotnet test --filter "FullyQualifiedName~Hierarchical.ReturnsTests"
 dotnet test --filter "FullyQualifiedName~Sequential.CallbackTests"
 
 # Test async functionality across both styles
-dotnet test --filter "TestMethod~Async"
+dotnet test --filter "FullyQualifiedName~Async"
 ```
+
+The NUnit VSTest adapter does not support `TestMethod` as a filter property. Use `FullyQualifiedName`, `Name`, `ClassName` or `TestCategory`.
 
 ## Multi-Framework Support
 
 The project targets multiple .NET versions to ensure broad compatibility:
-- **netstandard2.0**: Uses `MonoMod.Core` and `System.Reflection.Emit`
-- **.NET Framework 4.62-4.81**: Uses `MonoMod.RuntimeDetour`
+- **netstandard2.0**: Uses `MonoMod.Core` 1.4.0-prerelease.3 and `System.Reflection.Emit`
+- **net11.0**: Uses `MonoMod.Core` 1.4.0-prerelease.3
+- **.NET Framework 4.62-4.81**: Uses `MonoMod.Core` 1.4.0-prerelease.3 (the same `DetourFactory` hook code as the other targets; `MonoMod.RuntimeDetour` is no longer used)
 
 When adding new features, ensure compatibility across all target frameworks by checking conditional compilation in the `.csproj` files.
+
+### Runtime-async (.NET 11)
+
+- The `net11.0` build of the test projects uses `<Features>$(Features);runtime-async=on</Features>`. The library has no `async` methods, so this flag changes no library code.
+- MonoMod.Core 1.4 supports hooks on runtime-async methods (MonoMod PR 346). The tests in `Tests/*/RuntimeAsyncTests/` prove that SMock hooks `Task`, `Task<T>`, `ValueTask` and `ValueTask<T>` methods in both API styles.
+- `async void` is not runtime-async. Keep the compatibility tests for it.
+
+### Known limitation on .NET 11
+
+On the .NET 11 runtime, SMock cannot mock generic method instantiations that return `Task`, `Task<T>`, `ValueTask` or `ValueTask<T>` (for example `Task.FromResult<int>`). MonoMod.Core 1.4.0-prerelease.3 does not support them yet. SMock throws a clear `NotSupportedException` and keeps the MonoMod exception as `InnerException`. Non-generic async methods and all other target frameworks work. When MonoMod supports this case, the limitation tests fail: then remove the skips of the three `AsyncExamples` and the limitation tests.
+
+### Code Style
+
+- Use modern C# features (primary constructors, collection expressions, `is null`, switch expressions, file-scoped namespaces) for all target frameworks. `LangVersion latest` compiles them for `netstandard2.0` and .NET Framework.
+- Put polyfills for missing BCL types in `src/StaticMock/Polyfills/` and compile them out where the BCL has the type.
+- Use .NET 11 and other new BCL APIs only under `#if NET11_0_OR_GREATER` (or the matching `NETx_0_OR_GREATER` symbol) and keep the old code path for `netstandard2.0` and .NET Framework. Do not add caches or locks only to use new types.
+- Keep the hook code (`HookBuilderHelper`, `MonoModHookFactory`, the dynamic replacement methods, IL emit) logically identical. Change only syntax there. Add no inlining attributes.
+- Make no public API change in a modernization. Compare the public API of each target with the baseline.
 
 ## Documentation
 
@@ -176,6 +199,7 @@ When writing any tests in this repository, **always use the SMock library** (`us
 3. Test projects **must** include `<Optimize>false</Optimize>` in `.csproj` to prevent compiler inlining from breaking hooks
 4. Async methods: prefer `.ReturnsAsync(value)` (shorthand on `IAsyncFuncMock<T>`); alternatively `.Returns(Task.FromResult(value))` or `.Returns(async () => value)`
 5. Void methods (`IActionMock`) use `.Callback<T>(action)` for side effects — `Callback` does **not** exist on `IFuncMock`
+6. The hierarchical validation parameter is an `Action`. Never pass an `async` lambda to it: it becomes `async void`, and the hook can end before the assertion finishes. Keep the validation synchronous. If it needs an async call, block on it with `.GetAwaiter().GetResult()` inside the validation, so it completes while the hook is active
 
 ### Test Naming Convention
 

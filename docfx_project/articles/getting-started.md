@@ -57,16 +57,27 @@ dotnet add package SMock
 <PackageReference Include="SMock" Version="*" />
 ```
 
+> **Prerelease**: SMock 2.7.0-preview.1 is a prerelease. It depends on MonoMod prereleases for .NET 11 support. `Version="*"` selects stable versions only, so name the prerelease version to install it:
+>
+> ```bash
+> dotnet add package SMock --version 2.7.0-preview.1
+> ```
+>
+> ```xml
+> <PackageReference Include="SMock" Version="2.7.0-preview.1" />
+> ```
+
 ### Framework Support
 
 SMock supports a wide range of .NET implementations:
 
 | Target Framework | Support | Notes |
 |------------------|---------|-------|
-| .NET 5.0+ | ✅ Full | Recommended |
-| .NET Core 2.0+ | ✅ Full | Excellent performance |
+| .NET 11 (`net11.0`) | ✅ Full | Includes runtime-async hooks; see the known limitation below |
+| .NET Standard 2.0 | ✅ Full | Library compatibility; use it from .NET 10 (LTS) |
 | .NET Framework 4.62-4.81 | ✅ Full | Legacy support |
-| .NET Standard 2.0+ | ✅ Full | Library compatibility |
+
+The SMock tests run on .NET 10, .NET 11 and .NET Framework 4.6.2-4.8.1.
 
 ### First Test Setup
 
@@ -328,6 +339,8 @@ public async Task Mock_Async_Methods()
     ClassicAssert.AreEqual(100, result);
 }
 ```
+
+> **Known limitation on .NET 11**: On the .NET 11 runtime, SMock cannot mock generic method instantiations that return `Task`, `Task<T>`, `ValueTask` or `ValueTask<T>`. The example above (`Task.FromResult<int>`) throws a `NotSupportedException` there, because MonoMod.Core 1.4.0-prerelease.3 does not support them yet. Non-generic async methods, such as `Task.Delay` below, and all other target frameworks work.
 
 ### Mocking with Delays
 

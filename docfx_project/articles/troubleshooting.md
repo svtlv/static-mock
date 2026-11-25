@@ -422,6 +422,25 @@ public async Task Debug_Async_Mocking()
 }
 ```
 
+#### Known limitation on .NET 11
+
+On the .NET 11 runtime, SMock cannot mock generic method instantiations that return `Task`, `Task<T>`, `ValueTask` or `ValueTask<T>` (for example `Task.FromResult<int>`). MonoMod.Core 1.4.0-prerelease.3 does not support them yet. SMock throws a clear `NotSupportedException` and keeps the MonoMod exception as `InnerException`.
+
+```csharp
+// ❌ Throws NotSupportedException on the .NET 11 runtime (generic instantiation Task.FromResult<int>)
+using var mock = Mock.Setup(() => Task.FromResult(42)).Returns(Task.FromResult(100));
+
+// ✅ Non-generic async methods work on .NET 11 and on all other targets
+using var delayMock = Mock.Setup(context => Task.Delay(context.It.IsAny<int>()))
+    .Returns(Task.CompletedTask);
+```
+
+To work around the limitation, mock a non-generic method (for example a wrapper in your own code), or run these tests on `net10.0` or .NET Framework. All other target frameworks are not affected.
+
+#### Hierarchical validation must stay synchronous
+
+The validation parameter of the hierarchical `Mock.Setup` is an `Action`. Do not pass an `async` lambda to it: the lambda becomes `async void`, and the hook can end before the assertion finishes. Block on the async call inside the validation, for example with `.GetAwaiter().GetResult()`, so the assertion completes while the hook is active.
+
 ## Runtime Issues
 
 ### Hook Conflicts

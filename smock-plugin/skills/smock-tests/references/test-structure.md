@@ -23,7 +23,7 @@ The `[+ Description]` suffix is optional but recommended when a class has multip
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <!-- Required: prevents compiler optimizations from breaking SMock hooks -->
@@ -159,7 +159,7 @@ cd src
 dotnet test --no-build --configuration Debug --verbosity minimal
 
 # Specific framework
-dotnet test --framework net8.0 --no-build --configuration Debug
+dotnet test --framework net10.0 --no-build --configuration Debug
 
 # Specific class
 dotnet test --filter "ClassName=FileServiceTests"

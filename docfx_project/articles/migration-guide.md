@@ -4,6 +4,7 @@ This guide helps you migrate between different versions of SMock and provides gu
 
 ## Table of Contents
 - [Version Migration](#version-migration)
+- [Upgrading to 2.7.0-preview.1](#upgrading-to-270-preview1)
 - [Upgrading from Other Mocking Frameworks](#upgrading-from-other-mocking-frameworks)
 
 ## Version Migration
@@ -24,6 +25,46 @@ dotnet add package SMock --version [latest-version]
 # Check current version
 dotnet list package SMock
 ```
+
+### Upgrading to 2.7.0-preview.1
+
+SMock 2.7.0-preview.1 adds .NET 11 support. It is a **prerelease**, because it depends on the MonoMod prereleases (`MonoMod.Core 1.4.0-prerelease.3`). MonoMod has no stable release with a `net11.0` target yet. A stable SMock 2.7.0 follows when MonoMod is stable.
+
+`Version="*"` and `dotnet add package SMock` select stable versions only. Install the prerelease with an explicit version or with `--prerelease`:
+
+```bash
+dotnet add package SMock --version 2.7.0-preview.1
+# or install the latest prerelease
+dotnet add package SMock --prerelease
+```
+
+```xml
+<PackageReference Include="SMock" Version="2.7.0-preview.1" />
+```
+
+#### What changed
+
+| Area | Change |
+|------|--------|
+| New target | The library targets `net11.0` (next to `netstandard2.0` and .NET Framework 4.6.2-4.8.1) |
+| Dropped test targets | The tests no longer run on .NET 8 and .NET 9 (out of support). They run on .NET 10, .NET 11 and .NET Framework 4.6.2-4.8.1 |
+| MonoMod | The library uses `MonoMod.Core 1.4.0-prerelease.3` for all targets. `MonoMod.RuntimeDetour` is no longer a dependency |
+| Runtime-async | SMock hooks runtime-async methods on .NET 11 (`Task`, `Task<T>`, `ValueTask` and `ValueTask<T>`), in both API styles |
+| Public API | No public API change. The code modernization (C# 14/15 and .NET 11 APIs) changes no behavior |
+
+The library still has a `netstandard2.0` target, which .NET 8 and .NET 9 projects can use. SMock no longer tests on those runtimes, because they are out of support.
+
+#### Known limitation on .NET 11
+
+On the .NET 11 runtime, SMock cannot mock generic method instantiations that return `Task`, `Task<T>`, `ValueTask` or `ValueTask<T>` (for example `Task.FromResult<int>`), because MonoMod.Core 1.4.0-prerelease.3 does not support them yet. SMock throws a clear `NotSupportedException` and keeps the MonoMod exception as `InnerException`. Non-generic async methods and all other target frameworks work. If you mock such a method, mock a non-generic wrapper in your own code instead.
+
+#### Keep hierarchical validation synchronous
+
+The validation parameter of the hierarchical `Mock.Setup` is an `Action`. Do not pass an `async` lambda to it: it becomes `async void`, and the hook can end before the assertion finishes. Block on the async call inside the validation (for example with `.GetAwaiter().GetResult()`).
+
+#### If you use NUnit
+
+If you move your own tests to NUnit 5, `Assert.ThrowsAsync` and the other async asserts return a `Task`. Await them. In a sequential test, await them before the `using var` mock is disposed.
 
 ## Upgrading from Other Mocking Frameworks
 

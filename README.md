@@ -6,7 +6,7 @@
 [![NuGet Downloads](https://img.shields.io/nuget/dt/SMock.svg?style=for-the-badge&logo=nuget)](https://www.nuget.org/packages/SMock)
 [![GitHub Stars](https://img.shields.io/github/stars/svtlv/static-mock?style=for-the-badge&logo=github)](https://github.com/svtlv/static-mock/stargazers)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge)](LICENSE)
-[![.NET Version](https://img.shields.io/badge/.NET-Standard%202.0%2B-purple.svg?style=for-the-badge)](https://dotnet.microsoft.com/)
+[![.NET Version](https://img.shields.io/badge/.NET-Standard%202.0%20%7C%2011%20%7C%20Framework%204.6.2%2B-purple.svg?style=for-the-badge)](https://dotnet.microsoft.com/)
 
 **A mocking library that makes testing static methods easier!**
 
@@ -38,6 +38,36 @@ Install-Package SMock
 ```bash
 dotnet add package SMock
 ```
+
+### Supported Frameworks
+
+| Target | Notes |
+|--------|-------|
+| **.NET Standard 2.0** | Use it from .NET 10 (LTS), .NET 11 and other compatible runtimes |
+| **.NET 11** (`net11.0`) | Includes support for hooks on runtime-async methods |
+| **.NET Framework 4.6.2 to 4.8.1** | `net462`, `net47`, `net471`, `net472`, `net48`, `net481` |
+
+The SMock tests run on .NET 10, .NET 11 and .NET Framework 4.6.2 to 4.8.1. .NET 8 and .NET 9 are out of Microsoft support and are no longer test targets.
+
+### Prerelease: SMock 2.7.0-preview.1
+
+> ⚠️ **SMock 2.7.0-preview.1 is a prerelease.** It depends on the MonoMod prereleases `MonoMod.Core 1.4.0-prerelease.3`, because MonoMod has no stable release with a `net11.0` target yet. A stable SMock 2.7.0 follows when MonoMod ships stable versions.
+
+`Version="*"` and `dotnet add package SMock` select stable versions only. To install the prerelease, name the version or use `--prerelease`:
+
+```bash
+dotnet add package SMock --version 2.7.0-preview.1
+# or install the latest prerelease
+dotnet add package SMock --prerelease
+```
+
+```xml
+<PackageReference Include="SMock" Version="2.7.0-preview.1" />
+```
+
+### Known limitation on .NET 11
+
+On the .NET 11 runtime, SMock cannot mock generic method instantiations that return `Task`, `Task<T>`, `ValueTask` or `ValueTask<T>` (for example `Task.FromResult<int>`). MonoMod.Core 1.4.0-prerelease.3 does not support them yet. SMock throws a clear `NotSupportedException` for them. Non-generic async methods and all other target frameworks work.
 
 > 💡 **Pro Tip**: SMock works great with any testing framework - NUnit, xUnit, MSTest, you name it!
 
