@@ -1,3 +1,43 @@
-[review]
-# Codex reviews each plan draft read-only
-plan = auto
+# autopilot repository config: committed, shared by everyone who runs autopilot here.
+# Layering: built-in defaults < ~/.config/autopilot/config (AUTOPILOT_CONFIG)
+# < this file < AUTOPILOT_TIMEOUTS. Comments must be on their own lines.
+# Only the response times are configurable: names, updates and wake are fixed.
+
+[timeouts]
+# Response time per decision: 90s, 10m, 1h, 1h30m or never. After it the
+# recommended answer is taken and logged. <key>.remind sets a reminder before it.
+# question: planner clarifying question
+# question = 10m
+# choice: planner multiple choice
+# choice = 10m
+# yesno: planner yes/no
+# yesno = 10m
+# draft: plan draft review
+# draft = 30m
+# draft.remind = 10m
+# text: free-text prompt without a safe default
+# text = never
+# runtime: runner prompt during execution (the run is blocked)
+# runtime = 10m
+# decide: implement or stop after the plan explanation
+# decide = 1h
+# decide.remind = 15m
+# run_start: start a standalone run
+# run_start = 30m
+# run_start.remind = 10m
+# limit: long rate limit: switch executor or wait
+# limit = 30m
+# recovery: recovery step that needs a choice
+# recovery = 15m
+# preflight: preflight choice (worktree, spec override, doc drift, session)
+# preflight = 10m
+# plan_pick: which plan to run when several exist
+# plan_pick = never
+# plan_check: redesign a plan the runner cannot run well
+# plan_check = 15m
+# plan_review: any changes to the finished plan (plan-only flow)
+# plan_review = 30m
+# review_pick: the runner's plan review: External reviewer, Same agent or Skip review
+# review_pick = 10m
+# review_apply: which of the runner's plan review findings to apply
+# review_apply = 15m
