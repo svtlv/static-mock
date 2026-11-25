@@ -4,6 +4,9 @@ on:
   push:
     tags:
       - 'v*'
+  # Pull requests only run the release metadata check. They never test-release, pack or publish.
+  pull_request:
+    branches: [ master ]
   workflow_dispatch:
 
 permissions:
@@ -14,7 +17,22 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  check-release-metadata:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Validate project version and changelog
+        shell: pwsh
+        run: |
+          [xml] $project = Get-Content src/StaticMock/StaticMock.csproj -Raw
+          $version = $project.SelectSingleNode('/Project/PropertyGroup/Version').InnerText.Trim()
+          ./scripts/prepare-release.ps1 -Tag "v$version"
+
   validate:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.release.outputs.version }}
@@ -34,10 +52,12 @@ jobs:
           ./scripts/prepare-release.ps1 -Tag $env:RELEASE_TAG -OutputPath release-notes.md
 
   test:
+    if: github.event_name != 'pull_request'
     needs: validate
     uses: ./.github/workflows/build_and_test.yaml
 
   pack:
+    if: github.event_name != 'pull_request'
     needs: [validate, test]
     runs-on: ubuntu-latest
     steps:
@@ -46,7 +66,9 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: |
+            10.0.x
+            11.0.x
       - name: Prepare release notes
         shell: pwsh
         env:
@@ -66,6 +88,7 @@ jobs:
           if-no-files-found: error
 
   publish:
+    if: github.event_name != 'pull_request'
     needs: [validate, pack]
     runs-on: ubuntu-latest
     permissions:
@@ -78,7 +101,9 @@ jobs:
           path: packages
       - uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: |
+            10.0.x
+            11.0.x
       - name: Verify package checksum
         working-directory: packages
         run: sha256sum --check checksums.txt
