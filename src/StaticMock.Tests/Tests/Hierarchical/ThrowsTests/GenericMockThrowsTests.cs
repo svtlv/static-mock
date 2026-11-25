@@ -60,7 +60,7 @@ public class GenericMockThrowsTests
     {
         Mock.Setup(() => TestStaticAsyncClass.TestMethodReturnTask(), () =>
         {
-            ClassicAssert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTask());
+            Assert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTask()).GetAwaiter().GetResult();
         }).Throws<Exception>();
     }
 
@@ -69,7 +69,7 @@ public class GenericMockThrowsTests
     {
         Mock.Setup(() => TestStaticAsyncClass.TestMethodReturnTaskAsync(), () =>
         {
-            ClassicAssert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskAsync());
+            Assert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskAsync()).GetAwaiter().GetResult();
         }).Throws<Exception>();
     }
 
@@ -87,7 +87,7 @@ public class GenericMockThrowsTests
     {
         Mock.Setup(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync(), () =>
         {
-            ClassicAssert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync());
+            Assert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync()).GetAwaiter().GetResult();
         }).Throws<Exception>();
     }
 
@@ -96,7 +96,7 @@ public class GenericMockThrowsTests
     {
         Mock.Setup(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters(), () =>
         {
-            ClassicAssert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters());
+            Assert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters()).GetAwaiter().GetResult();
         }).Throws<Exception>();
     }
 
@@ -107,7 +107,7 @@ public class GenericMockThrowsTests
 
         Mock.Setup(() => instance.TestMethodReturnTask(), () =>
         {
-            ClassicAssert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTask());
+            Assert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTask()).GetAwaiter().GetResult();
         }).Throws<Exception>();
     }
 
@@ -118,7 +118,7 @@ public class GenericMockThrowsTests
 
         Mock.Setup(() => instance.TestMethodReturnTaskAsync(), () =>
         {
-            ClassicAssert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskAsync());
+            Assert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskAsync()).GetAwaiter().GetResult();
         }).Throws<Exception>();
     }
 
@@ -140,7 +140,7 @@ public class GenericMockThrowsTests
 
         Mock.Setup(() => instance.TestMethodReturnTaskWithoutParametersAsync(), () =>
         {
-            ClassicAssert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskWithoutParametersAsync());
+            Assert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskWithoutParametersAsync()).GetAwaiter().GetResult();
         }).Throws<Exception>();
     }
 
@@ -151,7 +151,7 @@ public class GenericMockThrowsTests
 
         Mock.Setup(() => instance.TestMethodReturnTaskWithoutParameters(), () =>
         {
-            ClassicAssert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskWithoutParameters());
+            Assert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskWithoutParameters()).GetAwaiter().GetResult();
         }).Throws<Exception>();
     }
 

@@ -133,9 +133,9 @@ public class MockReturnsTests
         var expectedResult = 2;
 
         Mock.Setup(typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters),
-            async () =>
+            () =>
             {
-                var actualResult = await TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters();
+                var actualResult = TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters().GetAwaiter().GetResult();
                 ClassicAssert.AreEqual(expectedResult, actualResult);
             }).Returns(Task.FromResult(expectedResult));
     }
@@ -148,9 +148,9 @@ public class MockReturnsTests
         var expectedResult = 2;
 
         Mock.Setup(typeof(TestStaticAsyncClass),
-            nameof(TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync), async () =>
+            nameof(TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync), () =>
             {
-                var actualResult = await TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync();
+                var actualResult = TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync().GetAwaiter().GetResult();
                 ClassicAssert.AreEqual(expectedResult, actualResult);
             }).Returns(Task.FromResult(expectedResult));
     }
@@ -164,9 +164,9 @@ public class MockReturnsTests
         var expectedResult = 2;
 
         Mock.Setup(typeof(TestInstance), nameof(TestInstance.TestMethodReturnTaskWithoutParameters),
-            new SetupProperties { Instance = instance }, async () =>
+            new SetupProperties { Instance = instance }, () =>
             {
-                var actualResult = await instance.TestMethodReturnTaskWithoutParameters();
+                var actualResult = instance.TestMethodReturnTaskWithoutParameters().GetAwaiter().GetResult();
                 ClassicAssert.AreEqual(expectedResult, actualResult);
             }).Returns(Task.FromResult(expectedResult));
     }
@@ -180,9 +180,9 @@ public class MockReturnsTests
         var expectedResult = 2;
 
         Mock.Setup(typeof(TestInstance), nameof(TestInstance.TestMethodReturnTaskWithoutParametersAsync),
-            new SetupProperties { Instance = instance }, async () =>
+            new SetupProperties { Instance = instance }, () =>
             {
-                var actualResult = await instance.TestMethodReturnTaskWithoutParametersAsync();
+                var actualResult = instance.TestMethodReturnTaskWithoutParametersAsync().GetAwaiter().GetResult();
                 ClassicAssert.AreEqual(expectedResult, actualResult);
             }).Returns(Task.FromResult(expectedResult));
     }
@@ -1076,10 +1076,10 @@ public class MockReturnsTests
                         typeof(string)
                     }
                 },
-                async () =>
+                () =>
                 {
                     var actualResult =
-                        await TestStaticAsyncClass.TestMethodReturnWithParametersAsync(parameter1, parameter2);
+                        TestStaticAsyncClass.TestMethodReturnWithParametersAsync(parameter1, parameter2).GetAwaiter().GetResult();
 
                     ClassicAssert.AreNotEqual(originalResult, actualResult);
                     ClassicAssert.AreEqual(expectedResult, actualResult);

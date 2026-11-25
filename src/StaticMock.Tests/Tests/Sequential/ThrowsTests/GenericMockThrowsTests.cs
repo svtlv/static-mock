@@ -51,19 +51,19 @@ public class GenericMockThrowsTests
     }
 
     [Test]
-    public void TestGenericThrowsTestMethodReturnTask()
+    public async Task TestGenericThrowsTestMethodReturnTask()
     {
         using var _ = Mock.Setup(() => TestStaticAsyncClass.TestMethodReturnTask()).Throws<Exception>();
 
-        ClassicAssert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTask());
+        await Assert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTask());
     }
 
     [Test]
-    public void TestGenericThrowsTestMethodReturnTaskAsync()
+    public async Task TestGenericThrowsTestMethodReturnTaskAsync()
     {
         using var _ = Mock.Setup(() => TestStaticAsyncClass.TestMethodReturnTaskAsync()).Throws<Exception>();
 
-        ClassicAssert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskAsync());
+        await Assert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskAsync());
     }
 
     [Test]
@@ -75,39 +75,39 @@ public class GenericMockThrowsTests
     }
 
     [Test]
-    public void TestGenericThrowsTestMethodReturnTaskWithoutParametersAsync()
+    public async Task TestGenericThrowsTestMethodReturnTaskWithoutParametersAsync()
     {
        using var _ = Mock.Setup(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync()).Throws<Exception>();
 
-        ClassicAssert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync());
+        await Assert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync());
     }
 
     [Test]
-    public void TestGenericThrowsTestMethodReturnTaskWithoutParameters()
+    public async Task TestGenericThrowsTestMethodReturnTaskWithoutParameters()
     {
         using var _ = Mock.Setup(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters()).Throws<Exception>();
 
-        ClassicAssert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters());
+        await Assert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters());
     }
 
     [Test]
-    public void TestGenericThrowsInstanceTestMethodReturnTask()
+    public async Task TestGenericThrowsInstanceTestMethodReturnTask()
     {
         var instance = new TestInstance();
 
         using var _ = Mock.Setup(() => instance.TestMethodReturnTask()).Throws<Exception>();
 
-        ClassicAssert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTask());
+        await Assert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTask());
     }
 
     [Test]
-    public void TestGenericThrowsInstanceTestMethodReturnTaskAsync()
+    public async Task TestGenericThrowsInstanceTestMethodReturnTaskAsync()
     {
         var instance = new TestInstance();
 
         using var _ = Mock.Setup(() => instance.TestMethodReturnTaskAsync()).Throws<Exception>();
 
-        ClassicAssert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskAsync());
+        await Assert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskAsync());
     }
 
     [Test]
@@ -121,23 +121,23 @@ public class GenericMockThrowsTests
     }
 
     [Test]
-    public void TestGenericThrowsInstanceTestMethodReturnTaskWithoutParametersAsync()
+    public async Task TestGenericThrowsInstanceTestMethodReturnTaskWithoutParametersAsync()
     {
         var instance = new TestInstance();
 
         using var _ = Mock.Setup(() => instance.TestMethodReturnTaskWithoutParametersAsync()).Throws<Exception>();
 
-        ClassicAssert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskWithoutParametersAsync());
+        await Assert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskWithoutParametersAsync());
     }
 
     [Test]
-    public void TestGenericThrowsInstanceTestMethodReturnTaskWithoutParameters()
+    public async Task TestGenericThrowsInstanceTestMethodReturnTaskWithoutParameters()
     {
         var instance = new TestInstance();
 
         using var _ = Mock.Setup(() => instance.TestMethodReturnTaskWithoutParameters()).Throws<Exception>();
 
-        ClassicAssert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskWithoutParameters());
+        await Assert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskWithoutParameters());
     }
 
     [Test]
