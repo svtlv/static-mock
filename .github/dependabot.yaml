@@ -1,11 +1,40 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+# Dependabot version updates.
+# Docs: https://docs.github.com/code-security/dependabot/working-with-dependabot/dependabot-options-reference
 
 version: 2
 updates:
+  # NuGet packages for the library, tests and benchmarks (src/StaticMock.sln).
+  - package-ecosystem: "nuget"
+    directory: "/src"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    groups:
+      # MonoMod packages must move together (MonoMod.Core and MonoMod.RuntimeDetour).
+      monomod:
+        patterns:
+          - "MonoMod.*"
+      # Test framework and runner.
+      test-framework:
+        patterns:
+          - "NUnit*"
+          - "Microsoft.NET.Test.Sdk"
+      # Microsoft.Extensions.* packages share one release train.
+      microsoft-extensions:
+        patterns:
+          - "Microsoft.Extensions.*"
+      benchmark:
+        patterns:
+          - "BenchmarkDotNet*"
+
+  # GitHub Actions used in .github/workflows.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
