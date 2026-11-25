@@ -36,4 +36,33 @@ public class StructInstanceMockReturnsTests
 
         ClassicAssert.AreEqual(expectedResult, testStruct.GetValueWithParameter(10));
     }
+
+    [Test]
+    public void TestStructInstanceMethodWithItIsAnyParameterReturns()
+    {
+        var testStruct = new TestStructInstance { Value = 1 };
+        const int expectedResult = 2;
+
+        using (Mock.Setup(context => testStruct.GetValueWithParameter(context.It.IsAny<int>())).Returns(expectedResult))
+        {
+            ClassicAssert.AreEqual(expectedResult, testStruct.GetValueWithParameter(10));
+            ClassicAssert.AreEqual(expectedResult, testStruct.GetValueWithParameter(20));
+        }
+
+        ClassicAssert.AreEqual(11, testStruct.GetValueWithParameter(10));
+    }
+
+    [Test]
+    public void TestStructInstanceMethodThrows()
+    {
+        var testStruct = new TestStructInstance { Value = 1 };
+
+        using (Mock.Setup(typeof(TestStructInstance), nameof(TestStructInstance.GetValueWithParameter), new SetupProperties { Instance = testStruct })
+                   .Throws<InvalidOperationException>())
+        {
+            Assert.Throws<InvalidOperationException>(() => testStruct.GetValueWithParameter(10));
+        }
+
+        ClassicAssert.AreEqual(11, testStruct.GetValueWithParameter(10));
+    }
 }

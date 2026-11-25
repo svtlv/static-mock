@@ -21,6 +21,8 @@ public class TestRuntimeAsyncInstanceTests
     [Test]
     public void TestEntityHasRuntimeAsyncMethodsForAllFourReturnTypes()
     {
+        Assert.That(RuntimeAsyncMethodNames, Is.Not.Empty, "The marker test cases must find runtime-async methods");
+
         var returnTypes = typeof(TestRuntimeAsyncInstance)
             .GetMethods(InstanceMethods | BindingFlags.Public | BindingFlags.DeclaredOnly)
             .Select(method => method.ReturnType)

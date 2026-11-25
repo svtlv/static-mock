@@ -60,6 +60,8 @@ void Mock.SetupDefault(Type type, string methodName);
 
 Accepts a validation `Action` that executes during the mock call. No disposal needed.
 
+The validation is synchronous. Never pass an `async` lambda: it becomes `async void`, and the hook can end before the assertion finishes. If the validation needs an async call, block on it with `.GetAwaiter().GetResult()`.
+
 ```csharp
 // Func with validation
 IFuncMock<TReturn> mock = Mock.Setup<TReturn>(Expression<Func<TReturn>> expr, Action validation);

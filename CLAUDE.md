@@ -66,6 +66,10 @@ Follow `docs/releasing.md`; `.github/workflows/release.yaml` tests, packs, publi
 to NuGet and GitHub Packages, and creates the GitHub release. Keep changes under
 `Unreleased` until preparing a specific release.
 
+Every pull request into `master` also runs two checks. The release metadata check in `release.yaml` runs
+`scripts/prepare-release.ps1` for the project `<Version>`. It fails when `CHANGELOG.md` has no dated section for that version.
+The docs workflow builds DocFX without a deploy. Neither check packs or publishes.
+
 ```bash
 # Pack the library for NuGet publication
 dotnet pack --configuration Release --output packages src/StaticMock/StaticMock.csproj
@@ -86,6 +90,7 @@ pwsh -File scripts/prepare-release.ps1 -Tag vX.Y.Z
 - `HookBuilderFactory`: Determines whether to create static or instance hook builders
 - `StaticHookBuilder`/`InstanceHookBuilder`: Create method hooks using MonoMod
 - `MonoModHookManager`: Manages hook lifecycle and method interception
+- `HookBuilderHelper` emits the hook of an instance method as a static method. Its first parameter is the declaring type (`ref T` for a value type). MonoMod.Core 1.4 maps the original `this` onto this parameter. `TestStructInstance` tests the value type path.
 
 **Mock Implementations** (`Mocks/`):
 - Hierarchical mocks: Support inline validation during setup
@@ -159,7 +164,9 @@ On the .NET 11 runtime, SMock cannot mock generic method instantiations that ret
 - Put polyfills for missing BCL types in `src/StaticMock/Polyfills/` and compile them out where the BCL has the type.
 - Use .NET 11 and other new BCL APIs only under `#if NET11_0_OR_GREATER` (or the matching `NETx_0_OR_GREATER` symbol) and keep the old code path for `netstandard2.0` and .NET Framework. Do not add caches or locks only to use new types.
 - Keep the hook code (`HookBuilderHelper`, `MonoModHookFactory`, the dynamic replacement methods, IL emit) logically identical. Change only syntax there. Add no inlining attributes.
-- Make no public API change in a modernization. Compare the public API of each target with the baseline.
+- `src/.editorconfig` sets the modern-syntax rules as build warnings (`EnforceCodeStyleInBuild`). Keep the build at 0 warnings.
+- Use `Guard.ThrowIfNull(value, nameof(value))` (`src/StaticMock/Helpers/Guard.cs`) for null checks. It calls `ArgumentNullException.ThrowIfNull` where the BCL has it.
+- Make no public API change in a modernization. Build `master` and this branch in Release, dump the public types and members of `StaticMock.dll` for each target with reflection, and compare the two dumps.
 
 ## Documentation
 

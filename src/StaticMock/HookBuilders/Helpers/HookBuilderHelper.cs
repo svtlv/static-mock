@@ -80,7 +80,7 @@ internal static class HookBuilderHelper
 
         var hookMethod = hookType.DefineMethod(
             DynamicTypeNames.ExceptionHookMethodName,
-            GetMethodAttributes(hookMethodType),
+            HookMethodAttributes,
             originalMethod.ReturnType,
             GetParameterTypes(hookMethodType, originalMethod));
 
@@ -115,7 +115,7 @@ internal static class HookBuilderHelper
 
         var hookMethod = hookType.DefineMethod(
             DynamicTypeNames.ReturnHookMethodName,
-            GetMethodAttributes(hookMethodType),
+            HookMethodAttributes,
             hookReturnType,
             GetParameterTypes(hookMethodType, originalMethod));
 
@@ -152,7 +152,7 @@ internal static class HookBuilderHelper
 
         var hookMethod = hookType.DefineMethod(
             DynamicTypeNames.ReturnHookMethodName,
-            GetMethodAttributes(hookMethodType),
+            HookMethodAttributes,
             hookReturnType,
             hookMethodParameterTypes);
 
@@ -212,7 +212,7 @@ internal static class HookBuilderHelper
 
         SetupExpressionCallImplementation(type, itParameterExpressions);
 
-        return type.GetMethod(hookMethod.Name, GetBindingFlags(hookMethodType)) ??
+        return type.GetMethod(hookMethod.Name, HookBindingFlags) ??
                throw new Exception($"{hookMethod.Name} not found in type {hookType.Name}");
     }
 
@@ -262,21 +262,10 @@ internal static class HookBuilderHelper
         }
     }
 
-    private static MethodAttributes GetMethodAttributes(HookMethodType hookMethodType) =>
-        hookMethodType switch
-        {
-            // MonoMod.Core maps the original 'this' onto the first parameter of a static hook method
-            // (AbiArgumentMap.InstanceToStatic), so hooks of instance methods are static too.
-            HookMethodType.Static or HookMethodType.Instance => MethodAttributes.Public | MethodAttributes.Static,
-            _ => throw new ArgumentOutOfRangeException(nameof(hookMethodType), hookMethodType, $"Method type {hookMethodType} isn't exists in {nameof(HookMethodType)}")
-        };
-
-    private static BindingFlags GetBindingFlags(HookMethodType hookMethodType) =>
-        hookMethodType switch
-        {
-            HookMethodType.Static or HookMethodType.Instance => BindingFlags.Public | BindingFlags.Static,
-            _ => throw new ArgumentOutOfRangeException(nameof(hookMethodType), hookMethodType, $"Method type {hookMethodType} isn't exists in {nameof(HookMethodType)}")
-        };
+    // MonoMod.Core maps the original 'this' onto the first parameter of a static hook method
+    // (AbiArgumentMap.InstanceToStatic), so hooks of instance methods are static too.
+    private const MethodAttributes HookMethodAttributes = MethodAttributes.Public | MethodAttributes.Static;
+    private const BindingFlags HookBindingFlags = BindingFlags.Public | BindingFlags.Static;
 
     private static Type GetThisParameterType(MethodBase originalMethod)
     {

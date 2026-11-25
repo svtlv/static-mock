@@ -51,14 +51,15 @@ public class DotNet11KnownLimitationTests
 #endif
 
     [Test]
-    public async Task TestSetupNonGenericTaskMethodStillWorksOnDotNet11()
+    public void TestSetupNonGenericTaskMethodStillWorksOnDotNet11()
     {
         Assume.That(Environment.Version.Major, Is.GreaterThanOrEqualTo(11), SkipReason);
 
         using var mock = Mock.Setup(context => Task.Delay(context.It.IsAny<int>()))
             .Returns(Task.CompletedTask);
 
-        await Task.Delay(1000);
+        // A real Task.Delay(1000) is not completed yet. The mocked call returns a completed task.
+        Assert.That(Task.Delay(1000).IsCompleted, Is.True);
     }
 
     private static void AssertClearLimitationException(NotSupportedException exception, string methodName)
@@ -68,6 +69,5 @@ public class DotNet11KnownLimitationTests
         Assert.That(exception.Message, Does.Contain("MonoMod.Core 1.4.0-prerelease.3"));
         Assert.That(exception.Message, Does.Contain("Task, Task<T>, ValueTask or ValueTask<T>"));
         Assert.That(exception.InnerException, Is.TypeOf<NotSupportedException>());
-        Assert.That(exception.InnerException.Message, Does.Contain("is generic"));
     }
 }

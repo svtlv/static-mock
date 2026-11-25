@@ -275,6 +275,7 @@ public void TestMethodNameWithInlineValidation()
 6. Exceptions (with args): `.Throws<ExceptionType>(new object[] { "message", arg2 })` or `.Throws(typeof(ExceptionType), "message")`
 7. Instance methods and static properties use the same lambda syntax as static methods
 8. Add `[MethodImpl(MethodImplOptions.NoOptimization)]` to a test method if mocks don't intercept in Release builds
+9. The hierarchical validation parameter is an `Action`. Never pass an `async` lambda to it: it becomes `async void` and the hook can end before the assertion finishes. Block on async calls with `.GetAwaiter().GetResult()` inside the validation
 
 ## Step 4: Update Project CLAUDE.md
 

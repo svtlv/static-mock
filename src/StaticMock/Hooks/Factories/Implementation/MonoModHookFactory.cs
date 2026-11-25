@@ -1,37 +1,25 @@
 ﻿using System;
 using System.Reflection;
 using MonoMod.Core;
-using StaticMock.Hooks.Entities;
 
 namespace StaticMock.Hooks.Factories.Implementation;
 
-internal class MonoModHookFactory : IHookFactory
+internal class MonoModHookFactory(MethodBase originalMethod) : IHookFactory
 {
     private const string TasksNamespacePrefix = "System.Threading.Tasks.";
-
-    private readonly MethodBase _originalMethod;
-    private readonly HookSettings _settings;
-
-#pragma warning disable IDE0290 // A primary constructor would report the unread 'settings' parameter (CS9113)
-    public MonoModHookFactory(MethodBase originalMethod, HookSettings settings)
-    {
-        _originalMethod = originalMethod;
-        _settings = settings;
-    }
-#pragma warning restore IDE0290
 
     public IDisposable? CreateHook(MethodInfo transpiler)
     {
         try
         {
-            return DetourFactory.Current.CreateDetour(_originalMethod, transpiler);
+            return DetourFactory.Current.CreateDetour(originalMethod, transpiler);
         }
-        catch (NotSupportedException exception) when (IsGenericTaskLikeMethodOnDotNet11(_originalMethod))
+        catch (NotSupportedException exception) when (IsGenericTaskLikeMethodOnDotNet11(originalMethod))
         {
             // Known limitation of MonoMod.Core 1.4.0-prerelease.3: on the .NET 11 runtime it cannot hook
             // a generic method instantiation that returns Task, Task<T>, ValueTask or ValueTask<T>.
             throw new NotSupportedException(
-                $"SMock cannot mock the method '{_originalMethod.DeclaringType}.{_originalMethod.Name}' on .NET 11. " +
+                $"SMock cannot mock the method '{originalMethod.DeclaringType}.{originalMethod.Name}' on .NET 11. " +
                 "MonoMod.Core 1.4.0-prerelease.3 cannot hook generic methods that return Task, Task<T>, ValueTask or ValueTask<T> on .NET 11. " +
                 "Mock a non-generic method instead, or run the test on an earlier runtime. See the MonoMod exception in InnerException.",
                 exception);
