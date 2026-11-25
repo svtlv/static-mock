@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Reflection;
-using StaticMock.Hooks.Entities;
-#if !NETFRAMEWORK
 using MonoMod.Core;
-#else
-using MonoMod.RuntimeDetour;
-#endif
+using StaticMock.Hooks.Entities;
 
 namespace StaticMock.Hooks.Factories.Implementation;
 
@@ -22,14 +18,6 @@ internal class MonoModHookFactory : IHookFactory
 
     public IDisposable? CreateHook(MethodInfo transpiler)
     {
-#if NETFRAMEWORK
-        if (!_originalMethod.IsStatic && _settings.OriginalMethodCallInstance == null)
-        {
-            throw new Exception($"Can't take calling instance of {_originalMethod} to create hook");
-        }
-        return new Hook(_originalMethod, transpiler, _originalMethod.IsStatic ? null : _settings.OriginalMethodCallInstance);
-#else
         return DetourFactory.Current.CreateDetour(_originalMethod, transpiler);
-#endif
     }
 }
