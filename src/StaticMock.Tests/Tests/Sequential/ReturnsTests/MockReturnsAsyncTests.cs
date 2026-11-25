@@ -121,11 +121,11 @@ public class MockReturnsAsyncTests
         using (Mock.Setup(typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnWithParametersAsync),
                        new SetupProperties
                        {
-                           MethodParametersTypes = new[]
-                           {
+                           MethodParametersTypes =
+                           [
                                typeof(int),
                                typeof(string)
-                           }
+                           ]
                        })
                    .Returns<int, string, Task<int>>(async (argument1, argument2) =>
                    {
@@ -159,12 +159,12 @@ public class MockReturnsAsyncTests
         using (Mock.Setup(typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnWithParametersAsync),
                        new SetupProperties
                        {
-                           MethodParametersTypes = new[]
-                           {
+                           MethodParametersTypes =
+                           [
                                typeof(int),
                                typeof(string),
                                typeof(double)
-                           }
+                           ]
                        })
                    .Returns<int, string, double, Task<int>>((argument1, argument2, argument3) =>
                    {
@@ -206,13 +206,13 @@ public class MockReturnsAsyncTests
         using (Mock.Setup(typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnWithParametersAsync),
                        new SetupProperties
                        {
-                           MethodParametersTypes = new[]
-                           {
+                           MethodParametersTypes =
+                           [
                                typeof(int),
                                typeof(string),
                                typeof(double),
                                typeof(int[]),
-                           }
+                           ]
                        })
                    .Returns<int, string, double, int[], Task<int>>(async (
                        argument1,
@@ -263,14 +263,14 @@ public class MockReturnsAsyncTests
         using (Mock.Setup(typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnWithParametersAsync),
                        new SetupProperties
                        {
-                           MethodParametersTypes = new[]
-                           {
+                           MethodParametersTypes =
+                           [
                                typeof(int),
                                typeof(string),
                                typeof(double),
                                typeof(int[]),
                                typeof(string[])
-                           }
+                           ]
                        })
                    .Returns<int, string, double, int[], string[], Task<int>>((
                        argument1,
@@ -326,15 +326,15 @@ public class MockReturnsAsyncTests
         using (Mock.Setup(typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnWithParametersAsync),
                        new SetupProperties
                        {
-                           MethodParametersTypes = new[]
-                           {
+                           MethodParametersTypes =
+                           [
                                typeof(int),
                                typeof(string),
                                typeof(double),
                                typeof(int[]),
                                typeof(string[]),
                                typeof(char)
-                           }
+                           ]
                        })
                    .Returns<int, string, double, int[], string[], char, Task<int>>(async (
                        argument1,
@@ -395,8 +395,8 @@ public class MockReturnsAsyncTests
         using (Mock.Setup(typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnWithParametersAsync),
                        new SetupProperties
                        {
-                           MethodParametersTypes = new[]
-                           {
+                           MethodParametersTypes =
+                           [
                                typeof(int),
                                typeof(string),
                                typeof(double),
@@ -404,7 +404,7 @@ public class MockReturnsAsyncTests
                                typeof(string[]),
                                typeof(char),
                                typeof(bool)
-                           }
+                           ]
                        })
                    .Returns<int, string, double, int[], string[], char, bool, Task<int>>((
                        argument1,
@@ -471,8 +471,8 @@ public class MockReturnsAsyncTests
         using (Mock.Setup(typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnWithParametersAsync),
                        new SetupProperties
                        {
-                           MethodParametersTypes = new[]
-                           {
+                           MethodParametersTypes =
+                           [
                                typeof(int),
                                typeof(string),
                                typeof(double),
@@ -481,7 +481,7 @@ public class MockReturnsAsyncTests
                                typeof(char),
                                typeof(bool),
                                typeof(TestInstance)
-                           }
+                           ]
                        })
                    .Returns<int, string, double, int[], string[], char, bool, TestInstance, Task<int>>(async (
                        argument1,
@@ -553,8 +553,8 @@ public class MockReturnsAsyncTests
         using (Mock.Setup(typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnWithParametersAsync),
                        new SetupProperties
                        {
-                           MethodParametersTypes = new[]
-                           {
+                           MethodParametersTypes =
+                           [
                                typeof(int),
                                typeof(string),
                                typeof(double),
@@ -564,7 +564,7 @@ public class MockReturnsAsyncTests
                                typeof(bool),
                                typeof(TestInstance),
                                typeof(Func<int, int>)
-                           }
+                           ]
                        })
                    .Returns<int, string, double, int[], string[], char, bool, TestInstance, Func<int, int>, Task<int>>((
                        argument1,

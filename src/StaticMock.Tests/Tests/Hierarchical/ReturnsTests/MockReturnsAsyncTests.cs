@@ -128,11 +128,11 @@ public class MockReturnsAsyncTests
         Mock.Setup(typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnWithParametersAsync),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string)
-                    }
+                    ]
                 },
                 () =>
                 {
@@ -167,12 +167,12 @@ public class MockReturnsAsyncTests
             typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnWithParametersAsync),
             new SetupProperties
             {
-                MethodParametersTypes = new[]
-                {
+                MethodParametersTypes =
+                [
                     typeof(int),
                     typeof(string),
                     typeof(double)
-                }
+                ]
             },
             () =>
             {
@@ -214,13 +214,13 @@ public class MockReturnsAsyncTests
                 typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnWithParametersAsync),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double),
                         typeof(int[]),
-                    }
+                    ]
                 },
                 () =>
                 {
@@ -273,14 +273,14 @@ public class MockReturnsAsyncTests
                 typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnWithParametersAsync),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double),
                         typeof(int[]),
                         typeof(string[])
-                    }
+                    ]
                 },
                 () =>
                 {
@@ -338,15 +338,15 @@ public class MockReturnsAsyncTests
                 typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnWithParametersAsync),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double),
                         typeof(int[]),
                         typeof(string[]),
                         typeof(char)
-                    }
+                    ]
                 },
                 () =>
                 {
@@ -409,8 +409,8 @@ public class MockReturnsAsyncTests
                 typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnWithParametersAsync),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double),
@@ -418,7 +418,7 @@ public class MockReturnsAsyncTests
                         typeof(string[]),
                         typeof(char),
                         typeof(bool)
-                    }
+                    ]
                 },
                 () =>
                 {
@@ -487,8 +487,8 @@ public class MockReturnsAsyncTests
                 typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnWithParametersAsync),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double),
@@ -497,7 +497,7 @@ public class MockReturnsAsyncTests
                         typeof(char),
                         typeof(bool),
                         typeof(TestInstance)
-                    }
+                    ]
                 },
                 () =>
                 {
@@ -571,8 +571,8 @@ public class MockReturnsAsyncTests
                 typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnWithParametersAsync),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double),
@@ -582,7 +582,7 @@ public class MockReturnsAsyncTests
                         typeof(bool),
                         typeof(TestInstance),
                         typeof(Func<int, int>)
-                    }
+                    ]
                 },
                 () =>
                 {

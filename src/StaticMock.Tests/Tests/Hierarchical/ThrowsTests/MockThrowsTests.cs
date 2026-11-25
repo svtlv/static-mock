@@ -233,7 +233,7 @@ public class MockThrowsTests
         {
             try
             {
-                var actualResult = methodInfo.Invoke(testInstance, new object[] { });
+                var actualResult = methodInfo.Invoke(testInstance, []);
             }
             catch (Exception e)
             {
@@ -258,7 +258,7 @@ public class MockThrowsTests
         {
             try
             {
-                var actualResult = mothodInfo.Invoke(testInstance, new object[] { });
+                var actualResult = mothodInfo.Invoke(testInstance, []);
             }
             catch (Exception e)
             {
@@ -286,7 +286,7 @@ public class MockThrowsTests
         {
             try
             {
-                var actualResult = mothodInfo.Invoke(testInstance, new object[] { });
+                var actualResult = mothodInfo.Invoke(testInstance, []);
             }
             catch (Exception e)
             {
@@ -305,7 +305,7 @@ public class MockThrowsTests
          {
              try
              {
-                 int result = (int)methodInfo.Invoke(type, new object[] { });
+                 int result = (int)methodInfo.Invoke(type, []);
              }
              catch (Exception e)
              {
@@ -321,14 +321,14 @@ public class MockThrowsTests
         Type type = typeof(TestStaticClass);
         PropertyInfo propertyInfo = type.GetProperty("PrivateStaticIntProperty", BindingFlags.NonPublic | BindingFlags.Static);
         MethodInfo mothodInfo = propertyInfo.GetMethod;
-        var originalValue = mothodInfo.Invoke(type, new object[] { });
+        var originalValue = mothodInfo.Invoke(type, []);
         ClassicAssert.AreEqual(default(int), originalValue);
 
         Mock.SetupProperty(typeof(TestStaticClass), propertyInfo.Name, BindingFlags.NonPublic | BindingFlags.Static, () =>
         {
             try
             {
-                var actualResult = (int)mothodInfo.Invoke(type, new object[] { });
+                var actualResult = (int)mothodInfo.Invoke(type, []);
             }
             catch (Exception e)
             {
@@ -343,14 +343,14 @@ public class MockThrowsTests
         Type type = typeof(TestStaticClass);
         PropertyInfo propertyInfo = type.GetProperty("PrivateStaticObjectProperty", BindingFlags.NonPublic | BindingFlags.Static);
         MethodInfo mothodInfo = propertyInfo.GetMethod;
-        var originalValue = mothodInfo.Invoke(type, new object[] { });
+        var originalValue = mothodInfo.Invoke(type, []);
         ClassicAssert.AreEqual(default, originalValue);
 
         Mock.SetupProperty(typeof(TestStaticClass), propertyInfo.Name, BindingFlags.NonPublic | BindingFlags.Static, () =>
         {
             try
             {
-                var actualResult = (int)mothodInfo.Invoke(type, new object[] { });
+                var actualResult = (int)mothodInfo.Invoke(type, []);
             }
             catch (Exception e)
             {
@@ -365,7 +365,7 @@ public class MockThrowsTests
         var originalResult = TestStaticClass.GenericTestMethodReturnDefaultWithoutParameters<int>();
         ClassicAssert.AreEqual(0, originalResult);
 
-        Mock.Setup(typeof(TestStaticClass), nameof(TestStaticClass.GenericTestMethodReturnDefaultWithoutParameters), new SetupProperties { GenericTypes = new[] { typeof(int) } },
+        Mock.Setup(typeof(TestStaticClass), nameof(TestStaticClass.GenericTestMethodReturnDefaultWithoutParameters), new SetupProperties { GenericTypes = [typeof(int)] },
             () =>
             {
                 Assert.Throws<Exception>(() => TestStaticClass.GenericTestMethodReturnDefaultWithoutParameters<int>());
@@ -383,7 +383,7 @@ public class MockThrowsTests
             new SetupProperties
             {
                 Instance = testInstance,
-                GenericTypes = new[] { typeof(int) }
+                GenericTypes = [typeof(int)]
             },
             () =>
             {
@@ -402,7 +402,7 @@ public class MockThrowsTests
             new SetupProperties
             {
                 Instance = testInstance,
-                GenericTypes = new[] { typeof(int) }
+                GenericTypes = [typeof(int)]
             },
             () =>
             {

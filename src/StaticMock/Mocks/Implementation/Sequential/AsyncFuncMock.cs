@@ -6,17 +6,9 @@ using StaticMock.Mocks.Returns;
 
 namespace StaticMock.Mocks.Implementation.Sequential;
 
-internal class AsyncFuncMock<TReturnValue> : FuncMock<Task<TReturnValue>>, IAsyncFuncMock<TReturnValue>
+internal class AsyncFuncMock<TReturnValue>(IHookBuilder hookBuilder, IHookManager hookManager)
+    : FuncMock<Task<TReturnValue>>(hookBuilder, hookManager), IAsyncFuncMock<TReturnValue>
 {
-    private readonly IHookBuilder _hookBuilder;
-    private readonly IHookManager _hookManager;
-
-    public AsyncFuncMock(IHookBuilder hookBuilder, IHookManager hookManager) : base(hookBuilder, hookManager)
-    {
-        _hookBuilder = hookBuilder;
-        _hookManager = hookManager;
-    }
-
     public IDisposable ReturnsAsync(TReturnValue value) =>
-        new ReturnsMock<TReturnValue>(_hookBuilder, _hookManager).ReturnsAsync(value);
+        new ReturnsMock<TReturnValue>(HookBuilder, HookManager).ReturnsAsync(value);
 }

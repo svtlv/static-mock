@@ -237,7 +237,7 @@ public class GenericMockThrowsTests
     public void TestThrowsParameterLessCustomExceptionTestMethodReturn1WithoutParameters()
     {
         const string message = "testExceptionMessage";
-        using var _ = Mock.Setup(() => TestStaticClass.TestMethodReturn1WithoutParameters()).Throws<CustomExceptionWithoutDefaultConstructor>(new object[] { message });
+        using var _ = Mock.Setup(() => TestStaticClass.TestMethodReturn1WithoutParameters()).Throws<CustomExceptionWithoutDefaultConstructor>([message]);
 
         Assert.Throws<CustomExceptionWithoutDefaultConstructor>(() => TestStaticClass.TestMethodReturn1WithoutParameters(), message);
     }
@@ -246,7 +246,7 @@ public class GenericMockThrowsTests
     public void TestThrowsExceptionWithMessageTestMethodReturn1WithoutParameters()
     {
         const string message = "testExceptionMessage";
-        using var _ = Mock.Setup(() => TestStaticClass.TestMethodReturn1WithoutParameters()).Throws<Exception>(new object[] { message });
+        using var _ = Mock.Setup(() => TestStaticClass.TestMethodReturn1WithoutParameters()).Throws<Exception>([message]);
 
         Assert.Throws<Exception>(() => TestStaticClass.TestMethodReturn1WithoutParameters(), message);
     }

@@ -215,7 +215,7 @@ public class MockThrowsTests
 
         try
         {
-            var actualResult = methodInfo.Invoke(testInstance, new object[] { });
+            var actualResult = methodInfo.Invoke(testInstance, []);
         }
         catch (Exception e)
         {
@@ -239,7 +239,7 @@ public class MockThrowsTests
 
         try
         {
-            var actualResult = methodInfo.Invoke(testInstance, new object[] { });
+            var actualResult = methodInfo.Invoke(testInstance, []);
         }
         catch (Exception e)
         {
@@ -264,7 +264,7 @@ public class MockThrowsTests
 
         try
         {
-            var actualResult = methodInfo.Invoke(testInstance, new object[] { });
+            var actualResult = methodInfo.Invoke(testInstance, []);
         }
         catch (Exception e)
         {
@@ -282,7 +282,7 @@ public class MockThrowsTests
 
         try
         {
-            int result = (int)methodInfo.Invoke(type, new object[] { });
+            int result = (int)methodInfo.Invoke(type, []);
         }
         catch (Exception e)
         {
@@ -296,14 +296,14 @@ public class MockThrowsTests
         var type = typeof(TestStaticClass);
         var propertyInfo = type.GetProperty("PrivateStaticIntProperty", BindingFlags.NonPublic | BindingFlags.Static);
         var methodInfo = propertyInfo.GetMethod;
-        var originalValue = methodInfo.Invoke(type, new object[] { });
+        var originalValue = methodInfo.Invoke(type, []);
         ClassicAssert.AreEqual(default(int), originalValue);
 
         using var _ = Mock.SetupProperty(typeof(TestStaticClass), propertyInfo.Name, BindingFlags.NonPublic | BindingFlags.Static).Throws<Exception>();
 
         try
         {
-            var actualResult = (int)methodInfo.Invoke(type, new object[] { });
+            var actualResult = (int)methodInfo.Invoke(type, []);
         }
         catch (Exception e)
         {
@@ -317,14 +317,14 @@ public class MockThrowsTests
         var type = typeof(TestStaticClass);
         var propertyInfo = type.GetProperty("PrivateStaticObjectProperty", BindingFlags.NonPublic | BindingFlags.Static);
         var methodInfo = propertyInfo.GetMethod;
-        var originalValue = methodInfo.Invoke(type, new object[] { });
+        var originalValue = methodInfo.Invoke(type, []);
         ClassicAssert.AreEqual(default, originalValue);
 
         using var _ = Mock.SetupProperty(typeof(TestStaticClass), propertyInfo.Name, BindingFlags.NonPublic | BindingFlags.Static).Throws<Exception>();
 
         try
         {
-            var actualResult = (int)methodInfo.Invoke(type, new object[] { });
+            var actualResult = (int)methodInfo.Invoke(type, []);
         }
         catch (Exception e)
         {
@@ -338,7 +338,7 @@ public class MockThrowsTests
         var originalResult = TestStaticClass.GenericTestMethodReturnDefaultWithoutParameters<int>();
         ClassicAssert.AreEqual(0, originalResult);
 
-        using var _ = Mock.Setup(typeof(TestStaticClass), nameof(TestStaticClass.GenericTestMethodReturnDefaultWithoutParameters), new SetupProperties { GenericTypes = new[] { typeof(int) } }).Throws<Exception>();
+        using var _ = Mock.Setup(typeof(TestStaticClass), nameof(TestStaticClass.GenericTestMethodReturnDefaultWithoutParameters), new SetupProperties { GenericTypes = [typeof(int)] }).Throws<Exception>();
 
         Assert.Throws<Exception>(() => TestStaticClass.GenericTestMethodReturnDefaultWithoutParameters<int>());
     }
@@ -354,7 +354,7 @@ public class MockThrowsTests
             new SetupProperties
             {
                 Instance = testInstance,
-                GenericTypes = new[] { typeof(int) }
+                GenericTypes = [typeof(int)]
             }).Throws<Exception>();
 
         Assert.Throws<Exception>(() => testInstance.GenericTestMethodReturnDefaultWithoutParameters<int>());
@@ -371,7 +371,7 @@ public class MockThrowsTests
             new SetupProperties
             {
                 Instance = testInstance,
-                GenericTypes = new[] { typeof(int) }
+                GenericTypes = [typeof(int)]
             }).Throws<Exception>();
 
         Assert.Throws<Exception>(() => testInstance.GenericTestMethodReturnDefaultWithoutParameters());

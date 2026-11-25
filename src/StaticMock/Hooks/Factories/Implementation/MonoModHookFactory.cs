@@ -12,11 +12,13 @@ internal class MonoModHookFactory : IHookFactory
     private readonly MethodBase _originalMethod;
     private readonly HookSettings _settings;
 
+#pragma warning disable IDE0290 // A primary constructor would report the unread 'settings' parameter (CS9113)
     public MonoModHookFactory(MethodBase originalMethod, HookSettings settings)
     {
         _originalMethod = originalMethod;
         _settings = settings;
     }
+#pragma warning restore IDE0290
 
     public IDisposable? CreateHook(MethodInfo transpiler)
     {

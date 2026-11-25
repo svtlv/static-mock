@@ -4,5 +4,5 @@ namespace StaticMock.Entities.Context;
 
 public class SetupContextState
 {
-    public List<ItParameterExpression> ItParameterExpressions { get; set; } = new();
+    public List<ItParameterExpression> ItParameterExpressions { get; set; } = [];
 }

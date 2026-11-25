@@ -48,40 +48,40 @@ public class SetupWithContextTests
     public void TestReturnSetupItIsWithParametersPositive()
     {
         const int expectedValue = 2;
-        ClassicAssert.AreEqual(1, TestStaticClass.TestMethodReturnWithParameters(1, Array.Empty<int>()));
+        ClassicAssert.AreEqual(1, TestStaticClass.TestMethodReturnWithParameters(1, []));
         Mock.Setup(context => TestStaticClass.TestMethodReturnWithParameters(
             context.It.Is<int>(x => x == 1), context.It.Is<int[]>(x => x.Length == 0)), () =>
         {
-            var actualValue = TestStaticClass.TestMethodReturnWithParameters(1, Array.Empty<int>());
+            var actualValue = TestStaticClass.TestMethodReturnWithParameters(1, []);
             ClassicAssert.AreEqual(expectedValue, actualValue);
         }).Returns(expectedValue);
-        ClassicAssert.AreEqual(1, TestStaticClass.TestMethodReturnWithParameters(1, Array.Empty<int>()));
+        ClassicAssert.AreEqual(1, TestStaticClass.TestMethodReturnWithParameters(1, []));
     }
 
     [Test]
     public void TestReturnSetupItIsWithParametersNegative()
     {
-        ClassicAssert.AreEqual(1, TestStaticClass.TestMethodReturnWithParameters(1, Array.Empty<int>()));
+        ClassicAssert.AreEqual(1, TestStaticClass.TestMethodReturnWithParameters(1, []));
         Mock.Setup(context => TestStaticClass.TestMethodReturnWithParameters(
             context.It.Is<int>(x => x == 1), context.It.Is<int[]>(x => x.Length == 0)), () =>
         {
-            Assert.Throws<Exception>(() => TestStaticClass.TestMethodReturnWithParameters(2, new []{ 0 }));
+            Assert.Throws<Exception>(() => TestStaticClass.TestMethodReturnWithParameters(2, [0]));
         }).Returns(default(int));
-        ClassicAssert.AreEqual(1, TestStaticClass.TestMethodReturnWithParameters(1, Array.Empty<int>()));
+        ClassicAssert.AreEqual(1, TestStaticClass.TestMethodReturnWithParameters(1, []));
     }
 
     [Test]
     public void TestReturnSetupItIsAnyWithParametersPositive()
     {
         const int expectedValue = 2;
-        ClassicAssert.AreEqual(1, TestStaticClass.TestMethodReturnWithParameters(1, Array.Empty<int>()));
+        ClassicAssert.AreEqual(1, TestStaticClass.TestMethodReturnWithParameters(1, []));
         Mock.Setup(context => TestStaticClass.TestMethodReturnWithParameters(
             context.It.IsAny<int>(), context.It.IsAny<int[]>()), () =>
         {
-            var actualValue = TestStaticClass.TestMethodReturnWithParameters(1, new []{ 0 });
+            var actualValue = TestStaticClass.TestMethodReturnWithParameters(1, [0]);
             ClassicAssert.AreEqual(expectedValue, actualValue);
         }).Returns(expectedValue);
-        ClassicAssert.AreEqual(1, TestStaticClass.TestMethodReturnWithParameters(1, Array.Empty<int>()));
+        ClassicAssert.AreEqual(1, TestStaticClass.TestMethodReturnWithParameters(1, []));
     }
 
     [Test]
@@ -200,38 +200,38 @@ public class SetupWithContextTests
     public void TestThrowsSetupInstanceItIsWithParametersPositive()
     {
         var instance = new TestInstance();
-        ClassicAssert.AreEqual(1, instance.TestMethodReturnWithParameters(1, Array.Empty<int>()));
+        ClassicAssert.AreEqual(1, instance.TestMethodReturnWithParameters(1, []));
         Mock.Setup(context => instance.TestMethodReturnWithParameters(
             context.It.Is<int>(x => x == 1), context.It.Is<int[]>(x => x.Length == 0)), () =>
         {
-            Assert.Throws<ArgumentException>(() => instance.TestMethodReturnWithParameters(1, Array.Empty<int>()));
+            Assert.Throws<ArgumentException>(() => instance.TestMethodReturnWithParameters(1, []));
         }).Throws<ArgumentException>();
-        ClassicAssert.AreEqual(1, instance.TestMethodReturnWithParameters(1, Array.Empty<int>()));
+        ClassicAssert.AreEqual(1, instance.TestMethodReturnWithParameters(1, []));
     }
 
     [Test]
     public void TestThrowsSetupInstanceItIsWithParametersNegative()
     {
         var instance = new TestInstance();
-        ClassicAssert.AreEqual(1, instance.TestMethodReturnWithParameters(1, Array.Empty<int>()));
+        ClassicAssert.AreEqual(1, instance.TestMethodReturnWithParameters(1, []));
         Mock.Setup(context => instance.TestMethodReturnWithParameters(
             context.It.Is<int>(x => x == 1), context.It.Is<int[]>(x => x.Length == 0)), () =>
         {
-            Assert.Throws<Exception>(() => instance.TestMethodReturnWithParameters(2, new []{ 0 }));
+            Assert.Throws<Exception>(() => instance.TestMethodReturnWithParameters(2, [0]));
         }).Throws<ArgumentException>();
-        ClassicAssert.AreEqual(1, instance.TestMethodReturnWithParameters(1, Array.Empty<int>()));
+        ClassicAssert.AreEqual(1, instance.TestMethodReturnWithParameters(1, []));
     }
 
     [Test]
     public void TestThrowsSetupInstanceItIsAnyWithParametersPositive()
     {
         var instance = new TestInstance();
-        ClassicAssert.AreEqual(1, instance.TestMethodReturnWithParameters(1, Array.Empty<int>()));
+        ClassicAssert.AreEqual(1, instance.TestMethodReturnWithParameters(1, []));
         Mock.Setup(context => instance.TestMethodReturnWithParameters(
             context.It.IsAny<int>(), context.It.IsAny<int[]>()), () =>
         {
-            Assert.Throws<ArgumentException>(() => instance.TestMethodReturnWithParameters(1, Array.Empty<int>()));
+            Assert.Throws<ArgumentException>(() => instance.TestMethodReturnWithParameters(1, []));
         }).Throws<ArgumentException>();
-        ClassicAssert.AreEqual(1, instance.TestMethodReturnWithParameters(1, Array.Empty<int>()));
+        ClassicAssert.AreEqual(1, instance.TestMethodReturnWithParameters(1, []));
     }
 }

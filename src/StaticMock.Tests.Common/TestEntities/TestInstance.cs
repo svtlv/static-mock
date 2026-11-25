@@ -92,14 +92,14 @@ public class TestInstance : IEquatable<TestInstance>
 
     public bool Equals(TestInstance other)
     {
-        if (ReferenceEquals(null, other)) return false;
+        if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
         return IntProperty == other.IntProperty && Equals(ObjectProperty, other.ObjectProperty) && PrivateIntProperty == other.PrivateIntProperty && Equals(PrivateObjectProperty, other.PrivateObjectProperty);
     }
 
     public override bool Equals(object obj)
     {
-        if (ReferenceEquals(null, obj)) return false;
+        if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
         if (obj.GetType() != GetType()) return false;
         return Equals((TestInstance)obj);
@@ -110,9 +110,9 @@ public class TestInstance : IEquatable<TestInstance>
         unchecked
         {
             var hashCode = IntProperty;
-            hashCode = (hashCode * 397) ^ (ObjectProperty != null ? ObjectProperty.GetHashCode() : 0);
+            hashCode = (hashCode * 397) ^ (ObjectProperty is not null ? ObjectProperty.GetHashCode() : 0);
             hashCode = (hashCode * 397) ^ PrivateIntProperty;
-            hashCode = (hashCode * 397) ^ (PrivateObjectProperty != null ? PrivateObjectProperty.GetHashCode() : 0);
+            hashCode = (hashCode * 397) ^ (PrivateObjectProperty is not null ? PrivateObjectProperty.GetHashCode() : 0);
             return hashCode;
         }
     }

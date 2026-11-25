@@ -193,7 +193,7 @@ public class EnterpriseScenarios
 
         if (!directoryExists)
         {
-            if (directoryPath != null) Directory.CreateDirectory(directoryPath);
+            if (directoryPath is not null) Directory.CreateDirectory(directoryPath);
         }
 
         var documentBytes = new byte[testDocument.Size];

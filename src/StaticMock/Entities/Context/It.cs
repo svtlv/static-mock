@@ -15,10 +15,12 @@ public class It
     /// Initializes a new instance of the <see cref="It"/> class with the specified setup context state.
     /// </summary>
     /// <param name="setupContextState">The setup context state that tracks parameter expressions.</param>
+#pragma warning disable IDE0290 // A primary constructor would lose the XML documentation of this public constructor
     public It(SetupContextState setupContextState)
     {
         _setupContextState = setupContextState;
     }
+#pragma warning restore IDE0290
 
     /// <summary>
     /// Matches any argument of the specified type. This is equivalent to calling <see cref="Is{TValue}(Expression{Func{TValue, bool}})"/>

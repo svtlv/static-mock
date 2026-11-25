@@ -262,7 +262,7 @@ public class GenericMockThrowsTests
         Mock.Setup(() => TestStaticClass.TestMethodReturn1WithoutParameters(), () =>
             {
                 Assert.Throws<CustomExceptionWithoutDefaultConstructor>(() => TestStaticClass.TestMethodReturn1WithoutParameters(), message);
-            }).Throws<CustomExceptionWithoutDefaultConstructor>(new object[] { message });
+            }).Throws<CustomExceptionWithoutDefaultConstructor>([message]);
     }
 
     [Test]
@@ -272,7 +272,7 @@ public class GenericMockThrowsTests
         Mock.Setup(() => TestStaticClass.TestMethodReturn1WithoutParameters(), () =>
         {
             Assert.Throws<Exception>(() => TestStaticClass.TestMethodReturn1WithoutParameters(), message);
-        }).Throws<Exception>(new object[] { message });
+        }).Throws<Exception>([message]);
     }
     
     [Test]
