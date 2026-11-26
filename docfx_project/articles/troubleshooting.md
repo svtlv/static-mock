@@ -443,6 +443,44 @@ The validation parameter of the hierarchical `Mock.Setup` is an `Action`. Do not
 
 ## Runtime Issues
 
+### Test Host Crashes When Mocking Shared BCL Members
+
+**Problem**: The test host process crashes ("Test host process crashed", "Test Run Aborted") while a test mocks a shared BCL member, for example `DateTime.Now` or `DateTime.UtcNow` with `.Throws<Exception>()`. No test is reported as failed. It occurs mostly on .NET Framework in the Debug configuration, and it is intermittent.
+
+**Cause**: A hook replaces the method for the whole process, not only for the test thread. The test framework and the test host also read `DateTime.Now` on their own threads (for example, to set the time of a test event). When one of these threads calls the hooked member while the mock is active, it gets the mocked exception or value. An unhandled exception on such a thread stops the process.
+
+```
+test thread                        test host / framework thread
+-----------                        ----------------------------
+Mock.Setup(() => DateTime.Now)
+  .Throws<Exception>()
+  hook is process-wide  ---------> reads DateTime.Now (event time)
+                                     -> Exception
+                                     -> unhandled -> process crash
+```
+
+**Note:** The hook is not limited to the thread that made the setup. Every thread in the process sees the mock while it is active.
+
+**Solution**:
+- Mark the test with `[NonParallelizable]`, so that no other test runs while the shared member is mocked:
+
+```csharp
+[Test]
+[NonParallelizable]
+public void TestDateTimeNowThrows()
+{
+    using var _ = Mock.Setup(context => DateTime.Now)
+        .Throws<Exception>();
+
+    Assert.Throws<Exception>(() => { var x = DateTime.Now; });
+}
+```
+
+- Run these tests in the Release configuration (`dotnet test --configuration Release`). The crash occurs mostly in Debug, where each test runs for a longer time.
+- Keep the time in which the mock is active short. Prefer to mock your own wrapper (for example, a `Clock.Now` property) instead of a BCL member that the test framework also uses.
+
+`[NonParallelizable]` stops other tests from running at the same time. It does not stop the threads of the test host. Thus, the two measures make the crash less frequent, but they cannot fully prevent it.
+
 ### Hook Conflicts
 
 **Problem**: Multiple mocks set up for the same method — the last one wins and replaces earlier ones.

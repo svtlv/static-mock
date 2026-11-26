@@ -276,6 +276,7 @@ public class GenericMockThrowsTests
     }
     
     [Test]
+    [NonParallelizable]
     public void TestGenericSetupReturnsDateTimeUtcNow()
     {
         Mock.Setup(context => DateTime.UtcNow, () =>
@@ -289,6 +290,7 @@ public class GenericMockThrowsTests
     }
     
     [Test]
+    [NonParallelizable]
     public void TestGenericSetupReturnsDateTimeNow()
     {
         Mock.Setup(context => DateTime.Now, () =>
