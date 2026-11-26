@@ -9,6 +9,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Optimize>false</Optimize>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <RunSettingsFilePath>$(MSBuildThisFileDirectory)StaticMock.Tests.runsettings</RunSettingsFilePath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='net11.0'">

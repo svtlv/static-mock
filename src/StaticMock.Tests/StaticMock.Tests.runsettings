@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <NUnit>
+    <!--
+      0 = no parallel dispatcher and no NUnit EventPump thread. Test events run on the test thread,
+      before and after the test body. A hook on a shared BCL member (for example DateTime.UtcNow with
+      Throws) is then never active while the adapter handles an event. With the EventPump, the adapter
+      reads DateTimeOffset.Now on its own thread, gets the mocked exception and the test host can crash.
+    -->
+    <NumberOfTestWorkers>0</NumberOfTestWorkers>
+  </NUnit>
+</RunSettings>

@@ -137,6 +137,8 @@ dotnet test --filter "FullyQualifiedName~Sequential.CallbackTests"
 dotnet test --filter "FullyQualifiedName~Async"
 ```
 
+`src/StaticMock.Tests/StaticMock.Tests.runsettings` (set by `RunSettingsFilePath` in the test project) sets NUnit `NumberOfTestWorkers` to `0`. Keep it: with the NUnit `EventPump` thread, the adapter reads `DateTimeOffset.Now` while a `DateTime.Now`/`UtcNow` throws mock is active, and the .NET Framework test host crashes.
+
 The NUnit VSTest adapter does not support `TestMethod` as a filter property. Use `FullyQualifiedName`, `Name`, `ClassName` or `TestCategory`.
 
 ## Multi-Framework Support
