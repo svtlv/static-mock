@@ -445,31 +445,35 @@ The validation parameter of the hierarchical `Mock.Setup` is an `Action`. Do not
 
 ### Test Host Crashes When Mocking Shared BCL Members
 
-**Problem**: The test host process crashes ("Test host process crashed", "Test Run Aborted") while a test mocks a shared BCL member, for example `DateTime.Now` or `DateTime.UtcNow` with `.Throws<Exception>()`. No test is reported as failed. Often the log shows `Error processing <test> event for <test>` just before the crash. It occurs mostly on .NET Framework, in the Debug and the Release configuration, and it is intermittent.
+**Problem**: On .NET Framework, the test host process crashes ("Test host process crashed", "Test Run Aborted") while a test mocks a shared framework member, for example `DateTime.Now` or `DateTime.UtcNow` with `.Throws<Exception>()`. No test is reported as failed, and the host writes nothing to stderr. The log often shows `Error processing <test> event for <test>` just before the crash. The test in that message can be an earlier test, because NUnit sends its events from a queue. The crash occurs in the Debug and the Release configuration. The Windows event log shows ".NET Runtime" event 1023 with exit code `80131506`.
 
-**Cause**: A hook replaces the method for the whole process, not only for the test thread. By default, NUnit sends test events (for example, "test started") on a separate `EventPump` thread. The NUnit adapter handles these events on that thread and reads the time (`DateTimeOffset.Now`, which calls `DateTime.UtcNow`). When it does this while the mock is active, it gets the mocked exception. An unhandled exception on such a thread stops the process.
+**Cause**: The NUnit adapter runs .NET Framework tests in a separate AppDomain. A hook on a member of `mscorlib` (such as `DateTime.Now`) changes code that all AppDomains share, but SMock loads the hook assembly only in the AppDomain of the test. The NUnit `EventPump` thread sends test events to the adapter in the default AppDomain. The adapter reads the time there and gets the mocked exception. When it builds the stack trace of this exception, the CLR finds no assembly for the hook frame in the default AppDomain and stops with an access violation in `Assembly::GetSecurityDescriptor`.
 
 ```
-default (EventPump thread)              NumberOfTestWorkers = 0
---------------------------              -----------------------
-test thread:  hook ON                   one thread:
-event thread: "start-test" event          "start-test" event (hook OFF)
-  -> DateTimeOffset.Now                   test body (hook ON, then OFF)
-  -> hooked UtcNow throws                 "test-finished" event (hook OFF)
-  -> process crash
+test AppDomain                          default AppDomain (adapter)
+--------------                          ---------------------------
+hook assembly is loaded here only
+Mock.Setup(() => DateTime.Now)
+  .Throws<Exception>()
+  patches shared mscorlib code  ------> adapter reads DateTime.Now
+                                          -> hook runs -> throws
+                                          -> adapter: ex.ToString()
+                                          -> hook frame has no assembly
+                                             in this AppDomain
+                                          -> CLR access violation, crash
 ```
 
-**Note:** On the left, the event thread can read the time while the hook is on. On the right, the events and the test body run one after the other on one thread, so no event code sees the hook.
+**Note:** The patch on shared framework code is visible in every AppDomain, but the hook assembly is not. The crash occurs when the adapter builds a stack trace that contains the hook frame.
 
 **Solution**:
-- Set `NumberOfTestWorkers` to `0` in a `.runsettings` file. NUnit then uses no parallel dispatcher and no `EventPump` thread, and it sends the events on the test thread. Reference the file from the test project, so that `dotnet test` always uses it:
+- Run the tests in the default AppDomain. Set `DisableAppDomain` in a `.runsettings` file, and reference the file from the test project, so that `dotnet test` always uses it. .NET (Core) has no AppDomains and ignores this setting:
 
 ```xml
 <!-- MyProject.Tests.runsettings -->
 <RunSettings>
-  <NUnit>
-    <NumberOfTestWorkers>0</NumberOfTestWorkers>
-  </NUnit>
+  <RunConfiguration>
+    <DisableAppDomain>true</DisableAppDomain>
+  </RunConfiguration>
 </RunSettings>
 ```
 
@@ -480,7 +484,7 @@ event thread: "start-test" event          "start-test" event (hook OFF)
 </PropertyGroup>
 ```
 
-- If your suite runs tests in parallel, mark each test that mocks a shared BCL member with `[NonParallelizable]`, so that no other test runs while the member is mocked:
+- If your suite runs tests in parallel, mark each test that mocks a shared framework member with `[NonParallelizable]`, so that no other test runs while the member is mocked:
 
 ```csharp
 [Test]
@@ -494,9 +498,9 @@ public void TestDateTimeNowThrows()
 }
 ```
 
-- Keep the time in which the mock is active short. Prefer to mock your own wrapper (for example, a `Clock.Now` property) instead of a BCL member that the test framework also uses.
+- Prefer to mock your own wrapper (for example, a `Clock.Now` property) instead of a framework member that the test framework also uses.
 
-`[NonParallelizable]` and the Release configuration do not stop the `EventPump` thread. They do not prevent this crash alone. Other threads of your own code can also call the hooked member while the mock is active.
+`DisableAppDomain` stops the crash, but the adapter can still get the mocked value or exception on its own thread. Then it logs `Error processing ... event` and can lose the result of one test. The Release configuration, `[NonParallelizable]` and `NumberOfTestWorkers=0` do not stop the crash: the `EventPump` thread stays active in each case.
 
 ### Hook Conflicts
 

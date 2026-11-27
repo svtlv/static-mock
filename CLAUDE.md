@@ -137,7 +137,7 @@ dotnet test --filter "FullyQualifiedName~Sequential.CallbackTests"
 dotnet test --filter "FullyQualifiedName~Async"
 ```
 
-`src/StaticMock.Tests/StaticMock.Tests.runsettings` (set by `RunSettingsFilePath` in the test project) sets NUnit `NumberOfTestWorkers` to `0`. Keep it: with the NUnit `EventPump` thread, the adapter reads `DateTimeOffset.Now` while a `DateTime.Now`/`UtcNow` throws mock is active, and the .NET Framework test host crashes.
+`src/StaticMock.Tests/StaticMock.Tests.runsettings` (set by `RunSettingsFilePath` in the test project) sets `RunConfiguration.DisableAppDomain` to `true`. Keep it. Without it, the .NET Framework tests run in a separate AppDomain. A `DateTime.Now`/`UtcNow` throws mock patches shared `mscorlib` code. The adapter reads the time in the default AppDomain on the NUnit `EventPump` thread, and then builds the stack trace of the mocked exception. The CLR finds no hook assembly there and crashes (access violation in `Assembly::GetSecurityDescriptor`). `NumberOfTestWorkers=0` and `[NonParallelizable]` do not prevent this.
 
 The NUnit VSTest adapter does not support `TestMethod` as a filter property. Use `FullyQualifiedName`, `Name`, `ClassName` or `TestCategory`.
 

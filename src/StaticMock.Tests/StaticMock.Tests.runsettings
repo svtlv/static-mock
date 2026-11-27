@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RunSettings>
-  <NUnit>
+  <RunConfiguration>
     <!--
-      0 = no parallel dispatcher and no NUnit EventPump thread. Test events run on the test thread,
-      before and after the test body. A hook on a shared BCL member (for example DateTime.UtcNow with
-      Throws) is then never active while the adapter handles an event. With the EventPump, the adapter
-      reads DateTimeOffset.Now on its own thread, gets the mocked exception and the test host can crash.
+      .NET Framework only: run the tests in the default AppDomain, not in a separate NUnit AppDomain.
+      A hook on a shared framework member (for example DateTime.Now in mscorlib) is active in every
+      AppDomain, but the SMock hook assembly is loaded only in the AppDomain of the test. The NUnit
+      adapter reads the time in the default AppDomain while such a mock throws. It then builds the stack
+      trace of the mocked exception, and the CLR crashes with an access violation
+      (Assembly::GetSecurityDescriptor), because the hook frame has no assembly in that AppDomain.
+      .NET 10 and .NET 11 have no AppDomains and ignore this setting.
     -->
-    <NumberOfTestWorkers>0</NumberOfTestWorkers>
-  </NUnit>
+    <DisableAppDomain>true</DisableAppDomain>
+  </RunConfiguration>
 </RunSettings>

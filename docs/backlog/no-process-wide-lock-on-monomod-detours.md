@@ -24,11 +24,12 @@ that method substitution is serialized within one process:
 - add a test that sets up and disposes the same method from several threads at the same time.
 
 A lock serializes install and undo only. It cannot stop other threads from calling a hooked method while
-the mock is active. That is the cause of the intermittent test host crash on .NET Framework in
-`TestGenericSetupReturnsDateTimeNow` / `TestGenericSetupReturnsDateTimeUtcNow` (PR #57, Windows Debug
-and Release): the NUnit adapter reads `DateTimeOffset.Now` on the NUnit `EventPump` thread while the
-throwing mock is active. `src/StaticMock.Tests/StaticMock.Tests.runsettings` sets
-`NumberOfTestWorkers=0` to remove that thread. The lock does not fix that crash.
+the mock is active. That caused the .NET Framework test host crash in PR #57 (Windows Debug and
+Release): the NUnit adapter reads `DateTime.Now` in the default AppDomain on the NUnit `EventPump`
+thread while a `DateTime.Now`/`UtcNow` throws mock from the test AppDomain is active. It then builds
+the stack trace of the mocked exception, and the CLR crashes because the hook assembly is not loaded in
+that AppDomain. `src/StaticMock.Tests/StaticMock.Tests.runsettings` sets
+`RunConfiguration.DisableAppDomain=true` to stop the crash. The lock does not fix that crash.
 
 Keep the hook code logically identical, as `CLAUDE.md` requires: the lock wraps the MonoMod calls and
 changes no IL emit or replacement-method logic.
