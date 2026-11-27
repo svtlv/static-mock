@@ -177,6 +177,8 @@ Multi-arg variants exist up to 9 arguments:
 
 **There is no `Throws(Exception instance)` overload.** Use one of these:
 
+**Do not use `Throws` on shared framework members** such as `DateTime.Now` or `DateTime.UtcNow`. The mock is process-wide, and the test adapter reads these members on its own thread. It gets the exception, and on .NET Framework the test host can crash. Mock an owned wrapper (for example, `Clock.Now`) instead. For .NET Framework test projects, also set `RunConfiguration.DisableAppDomain=true` in the `.runsettings` file (see `test-structure.md`).
+
 #### `.Throws<TException>()` — throw by generic type (requires parameterless constructor)
 
 ```csharp

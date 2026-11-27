@@ -1,7 +1,7 @@
 ---
 name: SMock Tests
 description: This skill should be used when the user asks to "create tests", "add tests", "write tests", "use smock to test", "mock static methods in tests", "update tests to use SMock", "generate test structure", "add unit tests for a class or method", "check my tests", "fix my tests", "update SMock version", "check SMock version", or "/smock-tests" is invoked. Also activate when the user mentions "SMock" in context while discussing tests, asks about mocking static or instance methods, or is working on a .NET test project. Discovers or creates .NET test project structure, checks and updates the SMock package to the latest version, proactively finds untested or improperly mocked code across the entire codebase, and writes/updates tests using SMock only where mocking is actually needed — without asking the user which classes to test.
-version: 0.3.1
+version: 0.4.0
 argument-hint: "[sequential|hierarchical]"
 allowed-tools: Bash, Glob, Grep, Read, Write, Edit
 ---
@@ -43,6 +43,8 @@ Before writing any test, evaluate whether the method under test actually require
 | External services | Any static façade over a database, cache, message bus, or third-party API |
 | System clock / timer | `Stopwatch.GetTimestamp()`, `TimeProvider` static members |
 | Volatile or side-effecting statics | Logging singletons called via static, global config readers |
+
+**Shared framework members (`DateTime.Now`, `DateTime.UtcNow`, `Environment.*`, and so on) are also used by the test framework.** A mock of such a member is active for the whole process, so NUnit and the test adapter see it too. `.Returns(...)` on them is safe in a short `using` scope. To test a throwing clock or environment, do not use `.Throws(...)` on the framework member. Wrap the member in a static member that you own (for example, `Clock.Now => DateTime.Now`), make the code under test call the wrapper, and mock the wrapper. See rules 10 to 12 below.
 
 ### Do NOT mock with SMock when:
 
@@ -160,6 +162,14 @@ grep -rn "\.Returns(.*)\s*\n?\s*\.Callback\|\.Returns(.*).Callback" src/ --inclu
 
 # Missing <Optimize>false</Optimize> in test .csproj files
 grep -rL "Optimize>false" . --include="*.csproj" | grep -i test
+
+# Throws mocks on shared framework members (the test framework also calls them)
+grep -rnE "Mock\.Setup(Property)?\(.*(DateTime\.(Now|UtcNow|Today)|DateTimeOffset\.(Now|UtcNow)|Environment\.)" \
+  src/ --include="*.cs" -A3 | grep -n "\.Throws"
+
+# .NET Framework test projects (net4xx) without DisableAppDomain in their .runsettings
+grep -lE "<TargetFrameworks?>.*net4[0-9]+" $(find . -name "*.csproj" | grep -i test) 2>/dev/null
+grep -rl "DisableAppDomain>true" . --include="*.runsettings"
 ```
 
 For each hit, read the surrounding context and determine if it is a genuine violation. Report findings grouped by file, with line numbers.
@@ -195,6 +205,8 @@ After completing the audit, produce a concise report before making any changes:
 - [FILE:LINE] Missing `using var` on Sequential mock
 - [FILE:LINE] Standalone `It.IsAny<T>()` — should be `context.It.IsAny<T>()`
 - [FILE] Missing <Optimize>false</Optimize> in .csproj
+- [FILE:LINE] `.Throws` on `DateTime.Now` — mock an owned wrapper instead
+- [FILE] .NET Framework test project without `RunConfiguration.DisableAppDomain=true`
 
 ### Coverage Gaps
 - [SourceClass.Method] calls DateTime.Now — no test mocking this dependency
@@ -218,8 +230,9 @@ Naming conventions (non-negotiable):
 
 1. Create `src/OriginalProject.Tests/` directory
 2. Create the `.csproj` file (see `references/test-structure.md` for full template — includes `<Optimize>false</Optimize>`, SMock package ref, NUnit)
-3. Add to the solution: `dotnet sln add src/OriginalProject.Tests/OriginalProject.Tests.csproj`
-4. Mirror source folder structure in the test project
+3. If the test project targets .NET Framework (`net4xx`), add `OriginalProject.Tests.runsettings` with `RunConfiguration.DisableAppDomain=true` and reference it with `<RunSettingsFilePath>` (template in `references/test-structure.md`)
+4. Add to the solution: `dotnet sln add src/OriginalProject.Tests/OriginalProject.Tests.csproj`
+5. Mirror source folder structure in the test project
 
 ## Step 3: Write or Update Tests with SMock
 
@@ -276,6 +289,9 @@ public void TestMethodNameWithInlineValidation()
 7. Instance methods and static properties use the same lambda syntax as static methods
 8. Add `[MethodImpl(MethodImplOptions.NoOptimization)]` to a test method if mocks don't intercept in Release builds
 9. The hierarchical validation parameter is an `Action`. Never pass an `async` lambda to it: it becomes `async void` and the hook can end before the assertion finishes. Keep the validation synchronous. For an async call, prefer the sequential API and `await` inside the `using` scope. Block with `.GetAwaiter().GetResult()` only when the call returns an already completed task (for example, the mock returns a completed task). Never block on a pending task: a `SynchronizationContext` or a custom `TaskScheduler` can stop its continuation and cause a deadlock
+10. A hook is process-wide. While a mock is active, every thread sees it, and on .NET Framework every AppDomain sees a mock of an `mscorlib` member. NUnit and the test adapter read `DateTime.Now`/`UtcNow` on their own threads. Never use `.Throws(...)` on such shared framework members: the adapter gets the exception, and on .NET Framework the test host can crash ("Test host process crashed", no failed test, no stderr). Mock an owned wrapper (for example, `Clock.Now`) instead
+11. A .NET Framework test project needs a `.runsettings` file with `<RunConfiguration><DisableAppDomain>true</DisableAppDomain></RunConfiguration>`, referenced by `<RunSettingsFilePath>` in the `.csproj`. Without it, NUnit runs the tests in a separate AppDomain. A mock of an `mscorlib` member then reaches the adapter in the default AppDomain, where the hook assembly is not loaded, and the CLR can crash with an access violation
+12. If the suite runs tests in parallel, mark each test that mocks a shared framework member with `[NonParallelizable]`. The Release configuration, `[NonParallelizable]` and `NumberOfTestWorkers=0` do not stop the test adapter thread, so they do not replace rules 10 and 11
 
 ## Step 4: Update Project CLAUDE.md
 
@@ -321,6 +337,11 @@ If tests fail:
 - Check that `using var` is used for all Sequential mocks
 - Verify `.Throws<T>()` has the parameterless constructor constraint satisfied
 - Confirm `context.It.IsAny<T>()` is used — not a standalone `It` reference
+
+If the test host crashes ("Test host process crashed", "Test Run Aborted", often after `Error processing <test> event`):
+- Look for `.Throws(...)` on `DateTime.Now`, `DateTime.UtcNow` or another shared framework member, and mock an owned wrapper instead (rule 10)
+- On .NET Framework, add `RunConfiguration.DisableAppDomain=true` to the test project's `.runsettings` (rule 11)
+- The test name in `Error processing <test> event` can be an earlier test: NUnit sends its events from a queue
 
 ## Additional Resources
 

@@ -8,6 +8,10 @@ the latest SMock tag are listed under `Unreleased`.
 
 ## Unreleased
 
+### Improved
+
+- SMock Tests plugin 0.4.0: tell the skill that a mock is process-wide. It must not use `Throws` on shared framework members such as `DateTime.Now` (mock an owned wrapper instead), and it adds a `.runsettings` file with `RunConfiguration.DisableAppDomain=true` to .NET Framework test projects. Both prevent test host crashes.
+
 ## v2.7.0-preview.1 - 2026-11-25
 
 SMock 2.7.0-preview.1 is a prerelease. It depends on the MonoMod prereleases (`MonoMod.Core 1.4.0-prerelease.3`) for .NET 11 support, because MonoMod has no stable release with a `net11.0` target yet. A stable SMock 2.7.0 follows when MonoMod ships stable versions.

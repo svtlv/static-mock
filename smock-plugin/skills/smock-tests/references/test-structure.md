@@ -47,6 +47,39 @@ The `[+ Description]` suffix is optional but recommended when a class has multip
 
 ---
 
+## .NET Framework Test Projects: `.runsettings`
+
+If the test project targets .NET Framework (`net462` to `net481`, alone or in `<TargetFrameworks>`), add a `.runsettings` file next to the `.csproj` and reference it from the project. `dotnet test` then uses it in every run, also in CI:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<!-- OriginalProject.Tests.runsettings -->
+<RunSettings>
+  <RunConfiguration>
+    <!-- Run .NET Framework tests in the default AppDomain. .NET (Core) ignores this setting. -->
+    <DisableAppDomain>true</DisableAppDomain>
+  </RunConfiguration>
+</RunSettings>
+```
+
+```xml
+<!-- OriginalProject.Tests.csproj, in the first <PropertyGroup> -->
+<RunSettingsFilePath>$(MSBuildThisFileDirectory)OriginalProject.Tests.runsettings</RunSettingsFilePath>
+```
+
+**Why**: By default, the NUnit adapter runs .NET Framework tests in a separate AppDomain. A mock of an `mscorlib` member (for example, `DateTime.Now`) changes code that all AppDomains share, but the SMock hook assembly is loaded only in the test AppDomain. The adapter reads the time in the default AppDomain. If the mock throws, the adapter builds the stack trace of the exception, and the CLR crashes with an access violation ("Test host process crashed", no failed test, no stderr).
+
+```
+test AppDomain                    default AppDomain (adapter)
+--------------                    ---------------------------
+DateTime.Now mock (Throws) -----> adapter reads DateTime.Now -> exception
+hook assembly loaded here only    ex.ToString() -> no hook assembly here -> crash
+```
+
+**Note:** With `DisableAppDomain=true`, the tests and the adapter share one AppDomain, so the CLR finds the hook assembly. Still do not use `.Throws` on shared framework members: mock an owned wrapper (see `patterns.md`, "Time-Dependent Testing").
+
+---
+
 ## Adding to Solution
 
 After creating the project file:
@@ -181,3 +214,5 @@ This repository's test projects follow:
 - Tests organized into `Tests/Hierarchical/` and `Tests/Sequential/` sub-folders
 - Sub-folders: `ReturnsTests/`, `ThrowsTests/`, `CallbackTests/`
 - Class naming: `{Style}{Category}Tests` (e.g., `GenericSetupMockReturnsTests`, `MockThrowsTests`)
+- `src/StaticMock.Tests/StaticMock.Tests.runsettings` sets `RunConfiguration.DisableAppDomain=true` (referenced by `RunSettingsFilePath`)
+- Throwing-clock tests mock the wrappers `TestStaticClass.Now` / `TestStaticClass.UtcNow`, not `DateTime.Now` / `DateTime.UtcNow`
