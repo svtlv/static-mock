@@ -146,6 +146,11 @@ public static class TestStaticClass
     public static int StaticIntProperty { get; set; }
     public static object StaticObjectProperty { get; set; }
 
+    // Wrappers for DateTime.Now and DateTime.UtcNow. Tests that make the clock throw mock these instead of
+    // the shared mscorlib members, which the test framework also reads on its own threads.
+    public static DateTime Now => DateTime.Now;
+    public static DateTime UtcNow => DateTime.UtcNow;
+
     private static int PrivateStaticIntProperty { get; set; }
     private static object PrivateStaticObjectProperty { get; set; }
 

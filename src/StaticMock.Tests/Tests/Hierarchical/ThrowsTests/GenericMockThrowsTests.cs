@@ -276,28 +276,26 @@ public class GenericMockThrowsTests
     }
     
     [Test]
-    [NonParallelizable]
-    public void TestGenericSetupReturnsDateTimeUtcNow()
+    public void TestGenericSetupReturnsDateTimeUtcNowWrapper()
     {
-        Mock.Setup(context => DateTime.UtcNow, () =>
+        Mock.Setup(context => TestStaticClass.UtcNow, () =>
             {
                 Assert.Throws<Exception>(() =>
                 {
-                    var x = DateTime.UtcNow;
+                    var x = TestStaticClass.UtcNow;
                 });
             })
             .Throws<Exception>();
     }
     
     [Test]
-    [NonParallelizable]
-    public void TestGenericSetupReturnsDateTimeNow()
+    public void TestGenericSetupReturnsDateTimeNowWrapper()
     {
-        Mock.Setup(context => DateTime.Now, () =>
+        Mock.Setup(context => TestStaticClass.Now, () =>
             {
                 Assert.Throws<Exception>(() =>
                 {
-                    var x = DateTime.Now;
+                    var x = TestStaticClass.Now;
                 });
             })
             .Throws<Exception>();
