@@ -151,9 +151,9 @@ public class GenericSetupMockReturnsTests
         ClassicAssert.AreEqual(1, originalResult);
         var expectedResult = 2;
 
-        Mock.Setup(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters(), async () =>
+        Mock.Setup(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters(), () =>
         {
-            var actualResult = await TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters();
+            var actualResult = TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters().GetAwaiter().GetResult();
             ClassicAssert.AreEqual(expectedResult, actualResult);
         }).Returns(Task.FromResult(expectedResult));
     }
@@ -165,9 +165,9 @@ public class GenericSetupMockReturnsTests
         ClassicAssert.AreEqual(1, originalResult);
         var expectedResult = 2;
 
-        Mock.Setup(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync(), async () =>
+        Mock.Setup(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync(), () =>
         {
-            var actualResult = await TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync();
+            var actualResult = TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync().GetAwaiter().GetResult();
             ClassicAssert.AreEqual(expectedResult, actualResult);
         }).Returns(Task.FromResult(expectedResult));
     }
@@ -180,9 +180,9 @@ public class GenericSetupMockReturnsTests
         ClassicAssert.AreEqual(1, originalResult);
         var expectedResult = 2;
 
-        Mock.Setup(() => instance.TestMethodReturnTaskWithoutParameters(), async () =>
+        Mock.Setup(() => instance.TestMethodReturnTaskWithoutParameters(), () =>
         {
-            var actualResult = await instance.TestMethodReturnTaskWithoutParameters();
+            var actualResult = instance.TestMethodReturnTaskWithoutParameters().GetAwaiter().GetResult();
             ClassicAssert.AreEqual(expectedResult, actualResult);
         }).Returns(Task.FromResult(expectedResult));
     }
@@ -195,9 +195,9 @@ public class GenericSetupMockReturnsTests
         ClassicAssert.AreEqual(1, originalResult);
         var expectedResult = 2;
 
-        Mock.Setup(() => instance.TestMethodReturnTaskWithoutParametersAsync(), async () =>
+        Mock.Setup(() => instance.TestMethodReturnTaskWithoutParametersAsync(), () =>
         {
-            var actualResult = await instance.TestMethodReturnTaskWithoutParametersAsync();
+            var actualResult = instance.TestMethodReturnTaskWithoutParametersAsync().GetAwaiter().GetResult();
             ClassicAssert.AreEqual(expectedResult, actualResult);
         }).Returns(Task.FromResult(expectedResult));
     }
@@ -368,9 +368,9 @@ public class GenericSetupMockReturnsTests
 
         Mock.Setup(
                 () => TestStaticAsyncClass.TestMethodReturnWithParameterAsync(parameter1),
-                async () =>
+                () =>
                 {
-                    var actualResult = await TestStaticAsyncClass.TestMethodReturnWithParameterAsync(parameter1);
+                    var actualResult = TestStaticAsyncClass.TestMethodReturnWithParameterAsync(parameter1).GetAwaiter().GetResult();
 
                     ClassicAssert.AreNotEqual(originalResult, actualResult);
                     ClassicAssert.AreEqual(expectedResult, actualResult);
@@ -906,9 +906,9 @@ public class GenericSetupMockReturnsTests
 
         Mock.Setup(
                 context => TestStaticAsyncClass.TestMethodReturnWithParametersAsync(context.It.IsAny<int>(), context.It.IsAny<string>()),
-                async () =>
+                () =>
                 {
-                    var actualResult = await TestStaticAsyncClass.TestMethodReturnWithParametersAsync(parameter1, parameter2);
+                    var actualResult = TestStaticAsyncClass.TestMethodReturnWithParametersAsync(parameter1, parameter2).GetAwaiter().GetResult();
 
                     ClassicAssert.AreNotEqual(originalResult, actualResult);
                     ClassicAssert.AreEqual(expectedResult, actualResult);

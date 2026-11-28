@@ -80,7 +80,7 @@ internal static class HookBuilderHelper
 
         var hookMethod = hookType.DefineMethod(
             DynamicTypeNames.ExceptionHookMethodName,
-            GetMethodAttributes(hookMethodType),
+            HookMethodAttributes,
             originalMethod.ReturnType,
             GetParameterTypes(hookMethodType, originalMethod));
 
@@ -115,7 +115,7 @@ internal static class HookBuilderHelper
 
         var hookMethod = hookType.DefineMethod(
             DynamicTypeNames.ReturnHookMethodName,
-            GetMethodAttributes(hookMethodType),
+            HookMethodAttributes,
             hookReturnType,
             GetParameterTypes(hookMethodType, originalMethod));
 
@@ -152,7 +152,7 @@ internal static class HookBuilderHelper
 
         var hookMethod = hookType.DefineMethod(
             DynamicTypeNames.ReturnHookMethodName,
-            GetMethodAttributes(hookMethodType),
+            HookMethodAttributes,
             hookReturnType,
             hookMethodParameterTypes);
 
@@ -175,13 +175,10 @@ internal static class HookBuilderHelper
 
                 if (executableType != typeof(Action) && executableType != typeof(Func<>))
                 {
-#if NETFRAMEWORK
+                    // for instance hooks, argument 0 is the original 'this', so the original parameters start at 1
                     for (var i = hookMethodType == HookMethodType.Static ? 0 : 1; i < hookMethodParameterTypes.Length; i++)
-#else
-                    for (var i = 0; i < hookMethodParameterTypes.Length; i++)
-#endif
                     {
-                        il.Emit(OpCodes.Ldarg, hookMethodType == HookMethodType.Static ? i : i + 1);
+                        il.Emit(OpCodes.Ldarg, i);
                     }
                 }
                 
@@ -215,7 +212,7 @@ internal static class HookBuilderHelper
 
         SetupExpressionCallImplementation(type, itParameterExpressions);
 
-        return type.GetMethod(hookMethod.Name, GetBindingFlags(hookMethodType)) ??
+        return type.GetMethod(hookMethod.Name, HookBindingFlags) ??
                throw new Exception($"{hookMethod.Name} not found in type {hookType.Name}");
     }
 
@@ -229,7 +226,7 @@ internal static class HookBuilderHelper
         {
             var parameterExpression = itParameterExpressions[i].ParameterExpression;
 
-            if (parameterExpression != null)
+            if (parameterExpression is not null)
             {
                 var expressionStaticFiled = hookType.DefineField(
                     $"{DynamicTypeNames.ExpressionStaticFieldName}{i}",
@@ -239,11 +236,7 @@ internal static class HookBuilderHelper
                 hookMethodIl.Emit(OpCodes.Ldsfld, expressionStaticFiled);
                 hookMethodIl.Emit(
                     OpCodes.Ldarg,
-#if NETFRAMEWORK
-                    hookMethodType == HookMethodType.Static ? i : i + 2);
-#else
                     hookMethodType == HookMethodType.Static ? i : i + 1);
-#endif
                 hookMethodIl.Emit(OpCodes.Callvirt, parameterExpression.Type.GetMethod("Invoke") ?? throw new Exception($"Method 'Invoke' of type {parameterExpression.Type} not found"));
             }
         }
@@ -257,7 +250,7 @@ internal static class HookBuilderHelper
         {
             var parameterExpression = itParameterExpressions[i].ParameterExpression;
 
-            if (parameterExpression != null)
+            if (parameterExpression is not null)
             {
                 var expressionFieldInfo = type.GetField(
                                               $"{DynamicTypeNames.ExpressionStaticFieldName}{i}",
@@ -269,41 +262,18 @@ internal static class HookBuilderHelper
         }
     }
 
-    private static MethodAttributes GetMethodAttributes(HookMethodType hookMethodType)
+    // MonoMod.Core maps the original 'this' onto the first parameter of a static hook method
+    // (AbiArgumentMap.InstanceToStatic), so hooks of instance methods are static too.
+    private const MethodAttributes HookMethodAttributes = MethodAttributes.Public | MethodAttributes.Static;
+    private const BindingFlags HookBindingFlags = BindingFlags.Public | BindingFlags.Static;
+
+    private static Type GetThisParameterType(MethodBase originalMethod)
     {
-        var methodAttributes = MethodAttributes.Public;
+        var declaringType = originalMethod.DeclaringType ??
+                            throw new Exception($"Can't take declaring type of {originalMethod} to create hook");
 
-        switch (hookMethodType)
-        {
-            case HookMethodType.Static:
-                methodAttributes |= MethodAttributes.Static;
-                break;
-            case HookMethodType.Instance:
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(hookMethodType), hookMethodType, $"Method type {hookMethodType} isn't exists in {nameof(HookMethodType)}");
-        }
-
-        return methodAttributes;
-    }
-
-    private static BindingFlags GetBindingFlags(HookMethodType hookMethodType)
-    {
-        var bindingFlags = BindingFlags.Public;
-
-        switch (hookMethodType)
-        {
-            case HookMethodType.Static:
-                bindingFlags |= BindingFlags.Static;
-                break;
-            case HookMethodType.Instance:
-                bindingFlags |= BindingFlags.Instance;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(hookMethodType), hookMethodType, $"Method type {hookMethodType} isn't exists in {nameof(HookMethodType)}");
-        }
-
-        return bindingFlags;
+        // 'this' of an instance method of a value type is a managed pointer
+        return declaringType.IsValueType ? declaringType.MakeByRefType() : declaringType;
     }
 
     private static Type[] GetParameterTypes(HookMethodType hookMethodType, MethodBase originalMethod)
@@ -312,13 +282,8 @@ internal static class HookBuilderHelper
 
         return hookMethodType switch
         {
-            HookMethodType.Static => originalMethodParameters.ToArray(),
-#if NETFRAMEWORK
-            HookMethodType.Instance when originalMethod.DeclaringType != null => [originalMethod.DeclaringType, .. originalMethodParameters],
-#else
-            HookMethodType.Instance => originalMethodParameters.ToArray(),
-#endif
-            
+            HookMethodType.Static => [.. originalMethodParameters],
+            HookMethodType.Instance => [GetThisParameterType(originalMethod), .. originalMethodParameters],
             _ => throw new ArgumentOutOfRangeException(nameof(hookMethodType), hookMethodType, $"Method type {hookMethodType} isn't exists in {nameof(HookMethodType)}")
         };
     }

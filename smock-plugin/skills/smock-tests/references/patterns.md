@@ -22,6 +22,36 @@ public void TestCalculateExpiryDateReturnsCorrectDate()
 }
 ```
 
+### Throwing clock: mock an owned wrapper
+
+A mock is active for the whole process. NUnit and the test adapter also read `DateTime.Now` / `DateTime.UtcNow` on their own threads. If you make these members throw, the adapter gets the exception and can lose a test result, and on .NET Framework the test host can crash. Put the clock behind a static member that you own, and mock that member:
+
+```csharp
+// Production code
+public static class Clock
+{
+    public static DateTime Now => DateTime.Now;
+}
+
+public static class TokenService
+{
+    public static bool IsExpired(DateTime expiry) => Clock.Now > expiry;
+}
+
+// Test
+[Test]
+public void TestIsExpiredThrowsWhenClockFails()
+{
+    using var mock = Mock.Setup(() => Clock.Now)
+        .Throws<InvalidOperationException>();
+
+    ClassicAssert.Throws<InvalidOperationException>(() =>
+        TokenService.IsExpired(new DateTime(2024, 1, 1)));
+}
+```
+
+`.Returns(fixedNow)` on `DateTime.Now` itself is safe in a short `using` scope. If the suite runs tests in parallel, mark such tests `[NonParallelizable]`.
+
 ---
 
 ## File System Mocking
@@ -94,6 +124,8 @@ public async Task TestRetryLogicWithEventualSuccess()
 ---
 
 ## Exception Testing
+
+Use `.Throws` only on members that the test framework does not call. For `DateTime.Now`, `DateTime.UtcNow`, `Environment.*` and other shared framework members, mock an owned wrapper (see "Throwing clock" above).
 
 ```csharp
 [Test]

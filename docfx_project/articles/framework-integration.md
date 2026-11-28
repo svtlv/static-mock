@@ -786,7 +786,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        dotnet-version: ['6.0.x', '7.0.x', '8.0.x']
+        dotnet-version: ['10.0.x', '11.0.x']
 
     steps:
     - uses: actions/checkout@v3
@@ -879,7 +879,8 @@ pipeline {
 
 ```dockerfile
 # Test.Dockerfile
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+# Use sdk:11.0 to build and test on .NET 11
 
 WORKDIR /app
 

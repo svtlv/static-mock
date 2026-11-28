@@ -1,35 +1,46 @@
 ﻿using System;
 using System.Reflection;
-using StaticMock.Hooks.Entities;
-#if !NETFRAMEWORK
 using MonoMod.Core;
-#else
-using MonoMod.RuntimeDetour;
-#endif
 
 namespace StaticMock.Hooks.Factories.Implementation;
 
-internal class MonoModHookFactory : IHookFactory
+internal class MonoModHookFactory(MethodBase originalMethod) : IHookFactory
 {
-    private readonly MethodBase _originalMethod;
-    private readonly HookSettings _settings;
-
-    public MonoModHookFactory(MethodBase originalMethod, HookSettings settings)
-    {
-        _originalMethod = originalMethod;
-        _settings = settings;
-    }
+    private const string TasksNamespacePrefix = "System.Threading.Tasks.";
 
     public IDisposable? CreateHook(MethodInfo transpiler)
     {
-#if NETFRAMEWORK
-        if (!_originalMethod.IsStatic && _settings.OriginalMethodCallInstance == null)
+        try
         {
-            throw new Exception($"Can't take calling instance of {_originalMethod} to create hook");
+            return DetourFactory.Current.CreateDetour(originalMethod, transpiler);
         }
-        return new Hook(_originalMethod, transpiler, _originalMethod.IsStatic ? null : _settings.OriginalMethodCallInstance);
-#else
-        return DetourFactory.Current.CreateDetour(_originalMethod, transpiler);
-#endif
+        catch (NotSupportedException exception) when (IsGenericTaskLikeMethodOnDotNet11(originalMethod))
+        {
+            // Known limitation of MonoMod.Core 1.4.0-prerelease.3: on the .NET 11 runtime it cannot hook
+            // a generic method instantiation that returns Task, Task<T>, ValueTask or ValueTask<T>.
+            throw new NotSupportedException(
+                $"SMock cannot mock the method '{originalMethod.DeclaringType}.{originalMethod.Name}' on .NET 11. " +
+                "MonoMod.Core 1.4.0-prerelease.3 cannot hook generic methods that return Task, Task<T>, ValueTask or ValueTask<T> on .NET 11. " +
+                "Mock a non-generic method instead, or run the test on an earlier runtime. See the MonoMod exception in InnerException.",
+                exception);
+        }
+    }
+
+    private static bool IsGenericTaskLikeMethodOnDotNet11(MethodBase method)
+    {
+        return Environment.Version.Major >= 11
+            && method is MethodInfo { IsGenericMethod: true } methodInfo
+            && IsTaskLikeType(methodInfo.ReturnType);
+    }
+
+    private static bool IsTaskLikeType(Type type)
+    {
+        var typeDefinition = type.IsGenericType ? type.GetGenericTypeDefinition() : type;
+        var fullName = typeDefinition.FullName;
+
+        return fullName is TasksNamespacePrefix + "Task"
+            or TasksNamespacePrefix + "Task`1"
+            or TasksNamespacePrefix + "ValueTask"
+            or TasksNamespacePrefix + "ValueTask`1";
     }
 }

@@ -62,7 +62,7 @@ public class MockThrowsTests
     {
         Mock.Setup(typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnTask), () =>
         {
-            ClassicAssert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTask());
+            Assert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTask()).GetAwaiter().GetResult();
         }).Throws<Exception>();
     }
 
@@ -71,7 +71,7 @@ public class MockThrowsTests
     {
         Mock.Setup(typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnTaskAsync), () =>
         {
-            ClassicAssert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskAsync());
+            Assert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskAsync()).GetAwaiter().GetResult();
         }).Throws<Exception>();
     }
 
@@ -89,7 +89,7 @@ public class MockThrowsTests
     {
         Mock.Setup(typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync), () =>
         {
-            ClassicAssert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync());
+            Assert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync()).GetAwaiter().GetResult();
         }).Throws<Exception>();
     }
 
@@ -98,7 +98,7 @@ public class MockThrowsTests
     {
         Mock.Setup(typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters), () =>
         {
-            ClassicAssert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters());
+            Assert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters()).GetAwaiter().GetResult();
         }).Throws<Exception>();
     }
 
@@ -109,7 +109,7 @@ public class MockThrowsTests
 
         Mock.Setup(typeof(TestInstance), nameof(TestInstance.TestMethodReturnTask), new SetupProperties { Instance = instance }, () =>
         {
-            ClassicAssert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTask());
+            Assert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTask()).GetAwaiter().GetResult();
         }).Throws<Exception>();
     }
 
@@ -120,7 +120,7 @@ public class MockThrowsTests
 
         Mock.Setup(typeof(TestInstance), nameof(TestInstance.TestMethodReturnTaskAsync), new SetupProperties { Instance = instance }, () =>
         {
-            ClassicAssert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskAsync());
+            Assert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskAsync()).GetAwaiter().GetResult();
         }).Throws<Exception>();
     }
 
@@ -142,7 +142,7 @@ public class MockThrowsTests
 
         Mock.Setup(typeof(TestInstance), nameof(TestInstance.TestMethodReturnTaskWithoutParametersAsync), new SetupProperties { Instance = instance }, () =>
         {
-            ClassicAssert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskWithoutParametersAsync());
+            Assert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskWithoutParametersAsync()).GetAwaiter().GetResult();
         }).Throws<Exception>();
     }
 
@@ -153,7 +153,7 @@ public class MockThrowsTests
 
         Mock.Setup(typeof(TestInstance), nameof(TestInstance.TestMethodReturnTaskWithoutParameters), new SetupProperties { Instance = instance }, () =>
         {
-            ClassicAssert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskWithoutParameters());
+            Assert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskWithoutParameters()).GetAwaiter().GetResult();
         }).Throws<Exception>();
     }
 
@@ -233,7 +233,7 @@ public class MockThrowsTests
         {
             try
             {
-                var actualResult = methodInfo.Invoke(testInstance, new object[] { });
+                var actualResult = methodInfo.Invoke(testInstance, []);
             }
             catch (Exception e)
             {
@@ -258,7 +258,7 @@ public class MockThrowsTests
         {
             try
             {
-                var actualResult = mothodInfo.Invoke(testInstance, new object[] { });
+                var actualResult = mothodInfo.Invoke(testInstance, []);
             }
             catch (Exception e)
             {
@@ -286,7 +286,7 @@ public class MockThrowsTests
         {
             try
             {
-                var actualResult = mothodInfo.Invoke(testInstance, new object[] { });
+                var actualResult = mothodInfo.Invoke(testInstance, []);
             }
             catch (Exception e)
             {
@@ -305,7 +305,7 @@ public class MockThrowsTests
          {
              try
              {
-                 int result = (int)methodInfo.Invoke(type, new object[] { });
+                 int result = (int)methodInfo.Invoke(type, []);
              }
              catch (Exception e)
              {
@@ -321,14 +321,14 @@ public class MockThrowsTests
         Type type = typeof(TestStaticClass);
         PropertyInfo propertyInfo = type.GetProperty("PrivateStaticIntProperty", BindingFlags.NonPublic | BindingFlags.Static);
         MethodInfo mothodInfo = propertyInfo.GetMethod;
-        var originalValue = mothodInfo.Invoke(type, new object[] { });
+        var originalValue = mothodInfo.Invoke(type, []);
         ClassicAssert.AreEqual(default(int), originalValue);
 
         Mock.SetupProperty(typeof(TestStaticClass), propertyInfo.Name, BindingFlags.NonPublic | BindingFlags.Static, () =>
         {
             try
             {
-                var actualResult = (int)mothodInfo.Invoke(type, new object[] { });
+                var actualResult = (int)mothodInfo.Invoke(type, []);
             }
             catch (Exception e)
             {
@@ -343,14 +343,14 @@ public class MockThrowsTests
         Type type = typeof(TestStaticClass);
         PropertyInfo propertyInfo = type.GetProperty("PrivateStaticObjectProperty", BindingFlags.NonPublic | BindingFlags.Static);
         MethodInfo mothodInfo = propertyInfo.GetMethod;
-        var originalValue = mothodInfo.Invoke(type, new object[] { });
+        var originalValue = mothodInfo.Invoke(type, []);
         ClassicAssert.AreEqual(default, originalValue);
 
         Mock.SetupProperty(typeof(TestStaticClass), propertyInfo.Name, BindingFlags.NonPublic | BindingFlags.Static, () =>
         {
             try
             {
-                var actualResult = (int)mothodInfo.Invoke(type, new object[] { });
+                var actualResult = (int)mothodInfo.Invoke(type, []);
             }
             catch (Exception e)
             {
@@ -365,7 +365,7 @@ public class MockThrowsTests
         var originalResult = TestStaticClass.GenericTestMethodReturnDefaultWithoutParameters<int>();
         ClassicAssert.AreEqual(0, originalResult);
 
-        Mock.Setup(typeof(TestStaticClass), nameof(TestStaticClass.GenericTestMethodReturnDefaultWithoutParameters), new SetupProperties { GenericTypes = new[] { typeof(int) } },
+        Mock.Setup(typeof(TestStaticClass), nameof(TestStaticClass.GenericTestMethodReturnDefaultWithoutParameters), new SetupProperties { GenericTypes = [typeof(int)] },
             () =>
             {
                 Assert.Throws<Exception>(() => TestStaticClass.GenericTestMethodReturnDefaultWithoutParameters<int>());
@@ -383,7 +383,7 @@ public class MockThrowsTests
             new SetupProperties
             {
                 Instance = testInstance,
-                GenericTypes = new[] { typeof(int) }
+                GenericTypes = [typeof(int)]
             },
             () =>
             {
@@ -402,7 +402,7 @@ public class MockThrowsTests
             new SetupProperties
             {
                 Instance = testInstance,
-                GenericTypes = new[] { typeof(int) }
+                GenericTypes = [typeof(int)]
             },
             () =>
             {
@@ -431,26 +431,26 @@ public class MockThrowsTests
     }
     
     [Test]
-    public void TestGenericSetupReturnsDateTimeUtcNow()
+    public void TestGenericSetupReturnsDateTimeUtcNowWrapper()
     {
-        Mock.Setup(context => DateTime.UtcNow, () =>
+        Mock.Setup(context => TestStaticClass.UtcNow, () =>
             {
                 Assert.Throws<Exception>(() =>
                 {
-                    var x = DateTime.UtcNow;
+                    var x = TestStaticClass.UtcNow;
                 });
             })
             .Throws(typeof(Exception));
     }
     
     [Test]
-    public void TestGenericSetupReturnsDateTimeNow()
+    public void TestGenericSetupReturnsDateTimeNowWrapper()
     {
-        Mock.Setup(context => DateTime.Now, () =>
+        Mock.Setup(context => TestStaticClass.Now, () =>
             {
                 Assert.Throws<Exception>(() =>
                 {
-                    var x = DateTime.Now;
+                    var x = TestStaticClass.Now;
                 });
             })
             .Throws(typeof(Exception));

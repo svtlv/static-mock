@@ -1,46 +1,125 @@
 # Your GitHub workflow file under .github/workflows/
-# Trigger the action on push to main
+# Build the docs on every pull request into master (check only).
+# Publish them to GitHub Pages on push to master and on manual runs from master.
+# A run deploys only when its commit is still the head of master.
 name: build and publish docs
 on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  actions: read
-  pages: write
-  id-token: write
+  contents: read
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+# Runs on master build in parallel: each one has its own group, so nothing cancels or replaces
+# a run. Only the deploy job is serialized (see deploy-docs). Pull request checks and manual
+# checks on other branches never deploy. They share a group per pull request or branch and
+# cancel older runs.
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
-  
+  group: >-
+    ${{
+      github.event_name == 'pull_request' && format('docs-pr-{0}', github.event.pull_request.number)
+      || github.ref == 'refs/heads/master' && format('docs-build-{0}-{1}', github.run_id, github.run_attempt)
+      || format('docs-check-{0}', github.ref)
+    }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
 jobs:
-  publish-docs:
+  build-docs:
+    runs-on: ubuntu-latest
+    outputs:
+      is_latest: ${{ steps.latest.outputs.is_latest }}
+      # Each attempt uploads its own artifact. A full re-run keeps the artifact of the first
+      # attempt, and deploy-pages rejects two artifacts with the same name. The job output
+      # stays the same on a re-run of failed jobs, so the deploy job finds the right artifact.
+      artifact_name: github-pages-${{ github.run_attempt }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+
+    # A re-run keeps the original commit SHA. Deploy only when this run is for the current
+    # head of master, so a retry never publishes older docs over newer docs.
+    - name: Check that this run is for the latest master commit
+      id: latest
+      if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        latest_sha=$(gh api "repos/${GITHUB_REPOSITORY}/commits/master" --jq .sha)
+        if [ "${latest_sha}" = "${GITHUB_SHA}" ]; then
+          echo "is_latest=true" >> "${GITHUB_OUTPUT}"
+        else
+          echo "is_latest=false" >> "${GITHUB_OUTPUT}"
+          echo "::warning::Run commit ${GITHUB_SHA} is not the head of master (${latest_sha}). The docs are built but not deployed."
+        fi
+
+    - name: Dotnet Setup
+      uses: actions/setup-dotnet@v6
+      with:
+        dotnet-version: |
+          10.x
+          11.x
+
+    - run: dotnet tool update -g docfx
+    - run: docfx ./docfx_project/docfx.json
+
+    # Pull requests and runs from other branches only check that the docs build.
+    # Only a run on the latest master commit uploads the Pages artifact.
+    - name: Upload artifact
+      if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master' && steps.latest.outputs.is_latest == 'true'
+      uses: actions/upload-pages-artifact@v5
+      with:
+        name: github-pages-${{ github.run_attempt }}
+        # Upload the generated site
+        path: './docfx_project/_site'
+
+  deploy-docs:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master' && needs.build-docs.outputs.is_latest == 'true'
+    needs: build-docs
+    # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+    permissions:
+      actions: read
+      contents: read
+      pages: write
+      id-token: write
+    # One group serializes all production deployments, including re-runs. Pages rejects a
+    # deployment while another one is active. queue: max keeps every pending deploy job (a
+    # retry cannot replace the pending job of a newer commit). The freshness check below
+    # skips each job that is not for the head of master when its turn comes.
+    concurrency:
+      group: docs-production
+      queue: max
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v7
-    - name: Dotnet Setup
-      uses: actions/setup-dotnet@v6
-      with:
-        dotnet-version: 9.x
+    # Re-run only the failed jobs keeps the is_latest output of build-docs. So check the head
+    # of master again, immediately before the deployment, and skip an old artifact.
+    # Known limit: GitHub records a github-pages deployment when this job starts, so a job that
+    # skips here can show a success status for a commit that it did not publish. This case needs
+    # a newer push while this job waits in the queue, or a retry of an old run. The other options
+    # (fail the job, or cancel the run) show a false error and send notifications.
+    - name: Check that this run is still for the latest master commit
+      id: latest
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        latest_sha=$(gh api "repos/${GITHUB_REPOSITORY}/commits/master" --jq .sha)
+        if [ "${latest_sha}" = "${GITHUB_SHA}" ]; then
+          echo "is_latest=true" >> "${GITHUB_OUTPUT}"
+        else
+          echo "is_latest=false" >> "${GITHUB_OUTPUT}"
+          echo "::warning::Run commit ${GITHUB_SHA} is not the head of master (${latest_sha}). The docs are not deployed."
+        fi
 
-    - run: dotnet tool update -g docfx
-    - run: docfx ./docfx_project/docfx.json
-
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v5
-      with:
-        # Upload entire repository
-        path: './docfx_project/_site'
     - name: Deploy to GitHub Pages
       id: deployment
+      if: steps.latest.outputs.is_latest == 'true'
       uses: actions/deploy-pages@v5
+      with:
+        artifact_name: ${{ needs.build-docs.outputs.artifact_name }}

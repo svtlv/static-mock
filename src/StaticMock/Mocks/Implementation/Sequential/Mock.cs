@@ -1,27 +1,21 @@
 ﻿using System;
-using System.Linq;
 using StaticMock.HookBuilders;
 using StaticMock.Hooks;
 using StaticMock.Mocks.Throws;
 
 namespace StaticMock.Mocks.Implementation.Sequential;
 
-internal class Mock : IMock
+internal class Mock(IHookBuilder hookBuilder, IHookManager hookManager) : IMock
 {
-    private readonly IHookBuilder _hookBuilder;
-    private readonly IHookManager _hookManager;
+    protected IHookBuilder HookBuilder { get; } = hookBuilder;
 
-    public Mock(IHookBuilder hookBuilder, IHookManager hookManager)
-    {
-        _hookBuilder = hookBuilder;
-        _hookManager = hookManager;
-    }
+    protected IHookManager HookManager { get; } = hookManager;
 
     public IDisposable Throws(Type exceptionType) => ThrowsInternal(exceptionType, null);
 
     public IDisposable Throws(Type exceptionType, params object[] constructorArgs)
     {
-        if (constructorArgs == null || !constructorArgs.Any())
+        if (constructorArgs is not { Length: > 0 })
         {
             throw new Exception(
                 "Constructor args can't be null or empty. Try throws exception with parameterless constructor or put constructor args you want to use");
@@ -31,11 +25,11 @@ internal class Mock : IMock
     }
 
     public IDisposable Throws<TException>() where TException : Exception, new() =>
-        new ThrowsMock(_hookBuilder, _hookManager).Throws<TException>();
+        new ThrowsMock(HookBuilder, HookManager).Throws<TException>();
 
     public IDisposable Throws<TException>(object[] constructorArgs) where TException : Exception
     {
-        if (constructorArgs == null || !constructorArgs.Any())
+        if (constructorArgs is not { Length: > 0 })
         {
             throw new Exception(
                 "Constructor args can't be null or empty. Try throws exception with parameterless constructor or put constructor args you want to use");
@@ -45,5 +39,5 @@ internal class Mock : IMock
     }
 
     private IDisposable ThrowsInternal(Type exceptionType, object[]? constructorArgs) =>
-        new ThrowsMock(_hookBuilder, _hookManager).Throws(exceptionType, constructorArgs);
+        new ThrowsMock(HookBuilder, HookManager).Throws(exceptionType, constructorArgs);
 }

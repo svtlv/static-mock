@@ -1,0 +1,27 @@
+# Code style rules that keep the modern C# syntax of the code base.
+# The library project sets EnforceCodeStyleInBuild, so the build reports these rules as warnings.
+root = true
+
+[*.cs]
+
+# Primary constructors
+dotnet_diagnostic.IDE0290.severity = warning
+
+# Collection expressions
+dotnet_diagnostic.IDE0300.severity = warning
+dotnet_diagnostic.IDE0301.severity = warning
+dotnet_diagnostic.IDE0305.severity = warning
+
+# Null checks
+dotnet_diagnostic.IDE0041.severity = warning
+dotnet_diagnostic.IDE0150.severity = warning
+
+# Switch expressions
+dotnet_diagnostic.IDE0066.severity = warning
+
+# File-scoped namespaces
+csharp_style_namespace_declarations = file_scoped:warning
+dotnet_diagnostic.IDE0161.severity = warning
+
+# Target-typed new
+dotnet_diagnostic.IDE0090.severity = warning

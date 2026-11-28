@@ -1,48 +1,35 @@
 ﻿using System;
+using StaticMock.Helpers;
 using StaticMock.HookBuilders;
 using StaticMock.Hooks;
 
 namespace StaticMock.Mocks.Throws;
 
-internal class ThrowsMock : IThrowsMock
+internal class ThrowsMock(
+    IHookBuilder hookBuilder,
+    IHookManager hookManager) : IThrowsMock
 {
-    private readonly IHookBuilder _hookBuilder;
-    private readonly IHookManager _hookManager;
-
-    public ThrowsMock(
-        IHookBuilder hookBuilder,
-        IHookManager hookManager)
-    {
-        _hookBuilder = hookBuilder;
-        _hookManager = hookManager;
-    }
-
     public IReturnable Throws(Type exceptionType, params object[]? constructorArgs) =>
         ThrowsInternal(exceptionType, constructorArgs);
 
     public IReturnable Throws<TException>() where TException : Exception, new()
     {
-        var hook = _hookBuilder.CreateThrowsHook(new TException());
+        var hook = hookBuilder.CreateThrowsHook(new TException());
 
-        return _hookManager.ApplyHook(hook);
+        return hookManager.ApplyHook(hook);
     }
 
     private IReturnable ThrowsInternal(Type exceptionType, object[]? constructorArgs)
     {
-        if (exceptionType == null)
-        {
-            throw new ArgumentNullException(nameof(exceptionType));
-        }
+        Guard.ThrowIfNull(exceptionType, nameof(exceptionType));
 
-        var hookException = Activator.CreateInstance(exceptionType, constructorArgs) as Exception;
-
-        if (hookException == null)
+        if (Activator.CreateInstance(exceptionType, constructorArgs) is not Exception hookException)
         {
             throw new Exception($"{exceptionType.FullName} is not an Exception");
         }
 
-        var hook = _hookBuilder.CreateThrowsHook(hookException);
+        var hook = hookBuilder.CreateThrowsHook(hookException);
 
-        return _hookManager.ApplyHook(hook);
+        return hookManager.ApplyHook(hook);
     }
 }

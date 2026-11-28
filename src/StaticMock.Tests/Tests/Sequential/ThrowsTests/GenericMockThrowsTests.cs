@@ -51,19 +51,19 @@ public class GenericMockThrowsTests
     }
 
     [Test]
-    public void TestGenericThrowsTestMethodReturnTask()
+    public async Task TestGenericThrowsTestMethodReturnTask()
     {
         using var _ = Mock.Setup(() => TestStaticAsyncClass.TestMethodReturnTask()).Throws<Exception>();
 
-        ClassicAssert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTask());
+        await Assert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTask());
     }
 
     [Test]
-    public void TestGenericThrowsTestMethodReturnTaskAsync()
+    public async Task TestGenericThrowsTestMethodReturnTaskAsync()
     {
         using var _ = Mock.Setup(() => TestStaticAsyncClass.TestMethodReturnTaskAsync()).Throws<Exception>();
 
-        ClassicAssert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskAsync());
+        await Assert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskAsync());
     }
 
     [Test]
@@ -75,39 +75,39 @@ public class GenericMockThrowsTests
     }
 
     [Test]
-    public void TestGenericThrowsTestMethodReturnTaskWithoutParametersAsync()
+    public async Task TestGenericThrowsTestMethodReturnTaskWithoutParametersAsync()
     {
        using var _ = Mock.Setup(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync()).Throws<Exception>();
 
-        ClassicAssert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync());
+        await Assert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync());
     }
 
     [Test]
-    public void TestGenericThrowsTestMethodReturnTaskWithoutParameters()
+    public async Task TestGenericThrowsTestMethodReturnTaskWithoutParameters()
     {
         using var _ = Mock.Setup(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters()).Throws<Exception>();
 
-        ClassicAssert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters());
+        await Assert.ThrowsAsync<Exception>(() => TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters());
     }
 
     [Test]
-    public void TestGenericThrowsInstanceTestMethodReturnTask()
+    public async Task TestGenericThrowsInstanceTestMethodReturnTask()
     {
         var instance = new TestInstance();
 
         using var _ = Mock.Setup(() => instance.TestMethodReturnTask()).Throws<Exception>();
 
-        ClassicAssert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTask());
+        await Assert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTask());
     }
 
     [Test]
-    public void TestGenericThrowsInstanceTestMethodReturnTaskAsync()
+    public async Task TestGenericThrowsInstanceTestMethodReturnTaskAsync()
     {
         var instance = new TestInstance();
 
         using var _ = Mock.Setup(() => instance.TestMethodReturnTaskAsync()).Throws<Exception>();
 
-        ClassicAssert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskAsync());
+        await Assert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskAsync());
     }
 
     [Test]
@@ -121,23 +121,23 @@ public class GenericMockThrowsTests
     }
 
     [Test]
-    public void TestGenericThrowsInstanceTestMethodReturnTaskWithoutParametersAsync()
+    public async Task TestGenericThrowsInstanceTestMethodReturnTaskWithoutParametersAsync()
     {
         var instance = new TestInstance();
 
         using var _ = Mock.Setup(() => instance.TestMethodReturnTaskWithoutParametersAsync()).Throws<Exception>();
 
-        ClassicAssert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskWithoutParametersAsync());
+        await Assert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskWithoutParametersAsync());
     }
 
     [Test]
-    public void TestGenericThrowsInstanceTestMethodReturnTaskWithoutParameters()
+    public async Task TestGenericThrowsInstanceTestMethodReturnTaskWithoutParameters()
     {
         var instance = new TestInstance();
 
         using var _ = Mock.Setup(() => instance.TestMethodReturnTaskWithoutParameters()).Throws<Exception>();
 
-        ClassicAssert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskWithoutParameters());
+        await Assert.ThrowsAsync<Exception>(() => instance.TestMethodReturnTaskWithoutParameters());
     }
 
     [Test]
@@ -237,7 +237,7 @@ public class GenericMockThrowsTests
     public void TestThrowsParameterLessCustomExceptionTestMethodReturn1WithoutParameters()
     {
         const string message = "testExceptionMessage";
-        using var _ = Mock.Setup(() => TestStaticClass.TestMethodReturn1WithoutParameters()).Throws<CustomExceptionWithoutDefaultConstructor>(new object[] { message });
+        using var _ = Mock.Setup(() => TestStaticClass.TestMethodReturn1WithoutParameters()).Throws<CustomExceptionWithoutDefaultConstructor>([message]);
 
         Assert.Throws<CustomExceptionWithoutDefaultConstructor>(() => TestStaticClass.TestMethodReturn1WithoutParameters(), message);
     }
@@ -246,32 +246,32 @@ public class GenericMockThrowsTests
     public void TestThrowsExceptionWithMessageTestMethodReturn1WithoutParameters()
     {
         const string message = "testExceptionMessage";
-        using var _ = Mock.Setup(() => TestStaticClass.TestMethodReturn1WithoutParameters()).Throws<Exception>(new object[] { message });
+        using var _ = Mock.Setup(() => TestStaticClass.TestMethodReturn1WithoutParameters()).Throws<Exception>([message]);
 
         Assert.Throws<Exception>(() => TestStaticClass.TestMethodReturn1WithoutParameters(), message);
     }
     
     [Test]
-    public void TestGenericSetupReturnsDateTimeUtcNow()
+    public void TestGenericSetupReturnsDateTimeUtcNowWrapper()
     {
-        using var _ = Mock.Setup(context => DateTime.UtcNow)
+        using var _ = Mock.Setup(context => TestStaticClass.UtcNow)
             .Throws<Exception>();
 
         Assert.Throws<Exception>(() =>
         {
-            var x = DateTime.UtcNow;
+            var x = TestStaticClass.UtcNow;
         });
     }
     
     [Test]
-    public void TestGenericSetupReturnsDateTimeNow()
+    public void TestGenericSetupReturnsDateTimeNowWrapper()
     {
-        using var _ = Mock.Setup(context => DateTime.Now)
+        using var _ = Mock.Setup(context => TestStaticClass.Now)
             .Throws<Exception>();
 
         Assert.Throws<Exception>(() =>
         {
-            var x = DateTime.Now;
+            var x = TestStaticClass.Now;
         });
     }
     

@@ -44,7 +44,7 @@ public class SetupMockCallbackTests
         using var _ = Mock.SetupAction(typeof(TestStaticClass), nameof(TestStaticClass.TestVoidMethodWithParameters),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[] { typeof(int) }
+                    MethodParametersTypes = [typeof(int)]
                 })
             .Callback<int>(argument =>
             {
@@ -63,11 +63,11 @@ public class SetupMockCallbackTests
         using var _ = Mock.SetupAction(typeof(TestStaticClass), nameof(TestStaticClass.TestVoidMethodWithParameters),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string)
-                    }
+                    ]
                 })
             .Callback<int, string>((argument1, argument2) =>
             {
@@ -88,12 +88,12 @@ public class SetupMockCallbackTests
         using var _ = Mock.SetupAction(typeof(TestStaticClass), nameof(TestStaticClass.TestVoidMethodWithParameters),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double)
-                    }
+                    ]
                 })
             .Callback<int, string, double>((argument1, argument2, argument3) =>
             {
@@ -116,13 +116,13 @@ public class SetupMockCallbackTests
         using var _ = Mock.SetupAction(typeof(TestStaticClass), nameof(TestStaticClass.TestVoidMethodWithParameters),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double),
                         typeof(int[])
-                    }
+                    ]
                 })
             .Callback<int, string, double, int[]>((
                 argument1,
@@ -155,14 +155,14 @@ public class SetupMockCallbackTests
         using var _ = Mock.SetupAction(typeof(TestStaticClass), nameof(TestStaticClass.TestVoidMethodWithParameters),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double),
                         typeof(int[]),
                         typeof(string[])
-                    }
+                    ]
                 })
             .Callback<int, string, double, int[], string[]>((
                 argument1,
@@ -199,15 +199,15 @@ public class SetupMockCallbackTests
         using var _ = Mock.SetupAction(typeof(TestStaticClass), nameof(TestStaticClass.TestVoidMethodWithParameters),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double),
                         typeof(int[]),
                         typeof(string[]),
                         typeof(char)
-                    }
+                    ]
                 })
             .Callback<int, string, double, int[], string[], char>((
                 argument1,
@@ -248,8 +248,8 @@ public class SetupMockCallbackTests
         using var _ = Mock.SetupAction(typeof(TestStaticClass), nameof(TestStaticClass.TestVoidMethodWithParameters),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double),
@@ -257,7 +257,7 @@ public class SetupMockCallbackTests
                         typeof(string[]),
                         typeof(char),
                         typeof(bool)
-                    }
+                    ]
                 })
             .Callback<int, string, double, int[], string[], char, bool>((
                 argument1,
@@ -302,8 +302,8 @@ public class SetupMockCallbackTests
         using var _ = Mock.SetupAction(typeof(TestStaticClass), nameof(TestStaticClass.TestVoidMethodWithParameters),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double),
@@ -312,7 +312,7 @@ public class SetupMockCallbackTests
                         typeof(char),
                         typeof(bool),
                         typeof(TestInstance)
-                    }
+                    ]
                 })
             .Callback<int, string, double, int[], string[], char, bool, TestInstance>((
                 argument1,
@@ -361,8 +361,8 @@ public class SetupMockCallbackTests
         using var _ = Mock.SetupAction(typeof(TestStaticClass), nameof(TestStaticClass.TestVoidMethodWithParameters),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double),
@@ -372,7 +372,7 @@ public class SetupMockCallbackTests
                         typeof(bool),
                         typeof(TestInstance),
                         typeof(Func<int, int>)
-                    }
+                    ]
                 })
             .Callback<int, string, double, int[], string[], char, bool, TestInstance, Func<int, int>>((
                 argument1,
@@ -415,11 +415,11 @@ public class SetupMockCallbackTests
         var setup = Mock.SetupAction(typeof(TestStaticClass), nameof(TestStaticClass.TestVoidMethodWithParameters),
             new SetupProperties
             {
-                MethodParametersTypes = new[]
-                {
+                MethodParametersTypes =
+                [
                     typeof(int),
                     typeof(string)
-                }
+                ]
             });
 
         Assert.Throws<Exception>(() => setup.Callback<int>(argument => { }));
@@ -431,11 +431,11 @@ public class SetupMockCallbackTests
         var setup = Mock.SetupAction(typeof(TestStaticClass), nameof(TestStaticClass.TestVoidMethodWithParameters),
             new SetupProperties
             {
-                MethodParametersTypes = new[]
-                {
+                MethodParametersTypes =
+                [
                     typeof(int),
                     typeof(string)
-                }
+                ]
             });
 
         Assert.Throws<Exception>(() => setup.Callback<string, string>((argument1, argument2) => { }));
@@ -454,11 +454,11 @@ public class SetupMockCallbackTests
             typeof(TestStaticClass), nameof(TestStaticClass.TestVoidMethodWithParameters),
             new SetupProperties
             {
-                MethodParametersTypes = new[]
-                {
+                MethodParametersTypes =
+                [
                     typeof(int),
                     typeof(string)
-                }
+                ]
             }).Callback(() =>
         {
             executed = true;

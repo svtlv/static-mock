@@ -133,9 +133,9 @@ public class MockReturnsTests
         var expectedResult = 2;
 
         Mock.Setup(typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters),
-            async () =>
+            () =>
             {
-                var actualResult = await TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters();
+                var actualResult = TestStaticAsyncClass.TestMethodReturnTaskWithoutParameters().GetAwaiter().GetResult();
                 ClassicAssert.AreEqual(expectedResult, actualResult);
             }).Returns(Task.FromResult(expectedResult));
     }
@@ -148,9 +148,9 @@ public class MockReturnsTests
         var expectedResult = 2;
 
         Mock.Setup(typeof(TestStaticAsyncClass),
-            nameof(TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync), async () =>
+            nameof(TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync), () =>
             {
-                var actualResult = await TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync();
+                var actualResult = TestStaticAsyncClass.TestMethodReturnTaskWithoutParametersAsync().GetAwaiter().GetResult();
                 ClassicAssert.AreEqual(expectedResult, actualResult);
             }).Returns(Task.FromResult(expectedResult));
     }
@@ -164,9 +164,9 @@ public class MockReturnsTests
         var expectedResult = 2;
 
         Mock.Setup(typeof(TestInstance), nameof(TestInstance.TestMethodReturnTaskWithoutParameters),
-            new SetupProperties { Instance = instance }, async () =>
+            new SetupProperties { Instance = instance }, () =>
             {
-                var actualResult = await instance.TestMethodReturnTaskWithoutParameters();
+                var actualResult = instance.TestMethodReturnTaskWithoutParameters().GetAwaiter().GetResult();
                 ClassicAssert.AreEqual(expectedResult, actualResult);
             }).Returns(Task.FromResult(expectedResult));
     }
@@ -180,9 +180,9 @@ public class MockReturnsTests
         var expectedResult = 2;
 
         Mock.Setup(typeof(TestInstance), nameof(TestInstance.TestMethodReturnTaskWithoutParametersAsync),
-            new SetupProperties { Instance = instance }, async () =>
+            new SetupProperties { Instance = instance }, () =>
             {
-                var actualResult = await instance.TestMethodReturnTaskWithoutParametersAsync();
+                var actualResult = instance.TestMethodReturnTaskWithoutParametersAsync().GetAwaiter().GetResult();
                 ClassicAssert.AreEqual(expectedResult, actualResult);
             }).Returns(Task.FromResult(expectedResult));
     }
@@ -252,7 +252,7 @@ public class MockReturnsTests
         Type type = testInstance.GetType();
         MethodInfo methodInfo = type.GetMethod("TestPrivateMethodReturn1WithoutParameters",
             BindingFlags.NonPublic | BindingFlags.Instance);
-        ClassicAssert.AreEqual(1, methodInfo.Invoke(testInstance, new object[] { }));
+        ClassicAssert.AreEqual(1, methodInfo.Invoke(testInstance, []));
         var expectedResult = 2;
 
         Mock.Setup(typeof(TestInstance), methodInfo.Name, new SetupProperties
@@ -261,7 +261,7 @@ public class MockReturnsTests
             BindingFlags = BindingFlags.NonPublic | BindingFlags.Instance
         }, () =>
         {
-            var actualResult = methodInfo.Invoke(testInstance, new object[] { });
+            var actualResult = methodInfo.Invoke(testInstance, []);
             ClassicAssert.AreEqual(expectedResult, actualResult);
         }).Returns(expectedResult);
     }
@@ -274,7 +274,7 @@ public class MockReturnsTests
         PropertyInfo propertyInfo =
             type.GetProperty("PrivateIntProperty", BindingFlags.NonPublic | BindingFlags.Instance);
         MethodInfo mothodInfo = propertyInfo.GetMethod;
-        var originalValue = mothodInfo.Invoke(testInstance, new object[] { });
+        var originalValue = mothodInfo.Invoke(testInstance, []);
         ClassicAssert.AreEqual(default(int), originalValue);
         var expectedResult = 2;
 
@@ -284,7 +284,7 @@ public class MockReturnsTests
             BindingFlags = BindingFlags.NonPublic | BindingFlags.Instance
         }, () =>
         {
-            var actualResult = mothodInfo.Invoke(testInstance, new object[] { });
+            var actualResult = mothodInfo.Invoke(testInstance, []);
             ClassicAssert.AreEqual(expectedResult, actualResult);
         }).Returns(expectedResult);
     }
@@ -297,7 +297,7 @@ public class MockReturnsTests
         PropertyInfo propertyInfo =
             type.GetProperty("PrivateObjectProperty", BindingFlags.NonPublic | BindingFlags.Instance);
         MethodInfo mothodInfo = propertyInfo.GetMethod;
-        var originalValue = mothodInfo.Invoke(testInstance, new object[] { });
+        var originalValue = mothodInfo.Invoke(testInstance, []);
         ClassicAssert.AreEqual(default, originalValue);
         var expectedResult = new TestInstance();
 
@@ -307,7 +307,7 @@ public class MockReturnsTests
             BindingFlags = BindingFlags.NonPublic | BindingFlags.Instance
         }, () =>
         {
-            var actualResult = mothodInfo.Invoke(testInstance, new object[] { });
+            var actualResult = mothodInfo.Invoke(testInstance, []);
             ClassicAssert.AreEqual(expectedResult, actualResult);
         }).Returns(expectedResult);
     }
@@ -320,7 +320,7 @@ public class MockReturnsTests
         MethodInfo methodInfo = type.GetMethod("TestPrivateStaticMethodReturn1WithoutParameters",
             BindingFlags.Static | BindingFlags.NonPublic);
 
-        var originalResult = methodInfo.Invoke(type, new object[] { });
+        var originalResult = methodInfo.Invoke(type, []);
         var expectedResult = 2;
 
         Mock.Setup(
@@ -329,7 +329,7 @@ public class MockReturnsTests
                 BindingFlags.Static | BindingFlags.NonPublic,
                 () =>
                 {
-                    var actualResult = methodInfo.Invoke(type, new object[] { });
+                    var actualResult = methodInfo.Invoke(type, []);
 
                     ClassicAssert.AreNotEqual(originalResult, actualResult);
                     ClassicAssert.AreEqual(expectedResult, actualResult);
@@ -344,14 +344,14 @@ public class MockReturnsTests
         PropertyInfo propertyInfo =
             type.GetProperty("PrivateStaticIntProperty", BindingFlags.NonPublic | BindingFlags.Static);
         MethodInfo mothodInfo = propertyInfo.GetMethod;
-        var originalValue = mothodInfo.Invoke(type, new object[] { });
+        var originalValue = mothodInfo.Invoke(type, []);
         ClassicAssert.AreEqual(default(int), originalValue);
         var expectedResult = 2;
 
         Mock.SetupProperty(typeof(TestStaticClass), propertyInfo.Name, BindingFlags.NonPublic | BindingFlags.Static,
             () =>
             {
-                var actualResult = mothodInfo.Invoke(type, new object[] { });
+                var actualResult = mothodInfo.Invoke(type, []);
                 ClassicAssert.AreEqual(expectedResult, actualResult);
             }).Returns(expectedResult);
     }
@@ -363,14 +363,14 @@ public class MockReturnsTests
         PropertyInfo propertyInfo =
             type.GetProperty("PrivateStaticObjectProperty", BindingFlags.NonPublic | BindingFlags.Static);
         MethodInfo mothodInfo = propertyInfo.GetMethod;
-        var originalValue = mothodInfo.Invoke(type, new object[] { });
+        var originalValue = mothodInfo.Invoke(type, []);
         ClassicAssert.AreEqual(default, originalValue);
         var expectedResult = new TestInstance();
 
         Mock.SetupProperty(typeof(TestStaticClass), propertyInfo.Name, BindingFlags.NonPublic | BindingFlags.Static,
             () =>
             {
-                var actualResult = mothodInfo.Invoke(type, new object[] { });
+                var actualResult = mothodInfo.Invoke(type, []);
                 ClassicAssert.AreEqual(expectedResult, actualResult);
             }).Returns(expectedResult);
     }
@@ -383,7 +383,7 @@ public class MockReturnsTests
         var expectedResult = 2;
 
         Mock.Setup(typeof(TestStaticClass), nameof(TestStaticClass.GenericTestMethodReturnDefaultWithoutParameters),
-            new SetupProperties { GenericTypes = new[] { typeof(int) } },
+            new SetupProperties { GenericTypes = [typeof(int)] },
             () =>
             {
                 var actualResult = TestStaticClass.GenericTestMethodReturnDefaultWithoutParameters<int>();
@@ -405,7 +405,7 @@ public class MockReturnsTests
             new SetupProperties
             {
                 Instance = testInstance,
-                GenericTypes = new[] { typeof(int) }
+                GenericTypes = [typeof(int)]
             },
             () =>
             {
@@ -429,7 +429,7 @@ public class MockReturnsTests
             new SetupProperties
             {
                 Instance = testInstance,
-                GenericTypes = new[] { typeof(int) }
+                GenericTypes = [typeof(int)]
             },
             () =>
             {
@@ -501,11 +501,11 @@ public class MockReturnsTests
         Mock.Setup(typeof(TestStaticClass), nameof(TestStaticClass.TestMethodReturnWithParameters),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string)
-                    }
+                    ]
                 },
                 () =>
                 {
@@ -540,12 +540,12 @@ public class MockReturnsTests
                 typeof(TestStaticClass), nameof(TestStaticClass.TestMethodReturnWithParameters),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double)
-                    }
+                    ]
                 },
                 () =>
                 {
@@ -588,13 +588,13 @@ public class MockReturnsTests
                 typeof(TestStaticClass), nameof(TestStaticClass.TestMethodReturnWithParameters),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double),
                         typeof(int[]),
-                    }
+                    ]
                 },
                 () =>
                 {
@@ -647,14 +647,14 @@ public class MockReturnsTests
                 typeof(TestStaticClass), nameof(TestStaticClass.TestMethodReturnWithParameters),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double),
                         typeof(int[]),
                         typeof(string[])
-                    }
+                    ]
                 },
                 () =>
                 {
@@ -712,15 +712,15 @@ public class MockReturnsTests
                 typeof(TestStaticClass), nameof(TestStaticClass.TestMethodReturnWithParameters),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double),
                         typeof(int[]),
                         typeof(string[]),
                         typeof(char)
-                    }
+                    ]
                 },
                 () =>
                 {
@@ -783,8 +783,8 @@ public class MockReturnsTests
                 typeof(TestStaticClass), nameof(TestStaticClass.TestMethodReturnWithParameters),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double),
@@ -792,7 +792,7 @@ public class MockReturnsTests
                         typeof(string[]),
                         typeof(char),
                         typeof(bool)
-                    }
+                    ]
                 },
                 () =>
                 {
@@ -860,8 +860,8 @@ public class MockReturnsTests
                 typeof(TestStaticClass), nameof(TestStaticClass.TestMethodReturnWithParameters),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double),
@@ -870,7 +870,7 @@ public class MockReturnsTests
                         typeof(char),
                         typeof(bool),
                         typeof(TestInstance)
-                    }
+                    ]
                 },
                 () =>
                 {
@@ -943,8 +943,8 @@ public class MockReturnsTests
                 typeof(TestStaticClass), nameof(TestStaticClass.TestMethodReturnWithParameters),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string),
                         typeof(double),
@@ -954,7 +954,7 @@ public class MockReturnsTests
                         typeof(bool),
                         typeof(TestInstance),
                         typeof(Func<int, int>)
-                    }
+                    ]
                 },
                 () =>
                 {
@@ -1014,7 +1014,7 @@ public class MockReturnsTests
             typeof(TestStaticClass), nameof(TestStaticClass.TestMethodReturnWithParameters),
             new SetupProperties
             {
-                MethodParametersTypes = new[] { typeof(int), typeof(string) }
+                MethodParametersTypes = [typeof(int), typeof(string)]
             },
             () =>
             {
@@ -1042,7 +1042,7 @@ public class MockReturnsTests
             typeof(TestStaticClass), nameof(TestStaticClass.TestMethodReturnWithParameters),
             new SetupProperties
             {
-                MethodParametersTypes = new[] { typeof(int), typeof(string) }
+                MethodParametersTypes = [typeof(int), typeof(string)]
             },
             () =>
             {
@@ -1070,16 +1070,16 @@ public class MockReturnsTests
                 typeof(TestStaticAsyncClass), nameof(TestStaticAsyncClass.TestMethodReturnWithParametersAsync),
                 new SetupProperties
                 {
-                    MethodParametersTypes = new[]
-                    {
+                    MethodParametersTypes =
+                    [
                         typeof(int),
                         typeof(string)
-                    }
+                    ]
                 },
-                async () =>
+                () =>
                 {
                     var actualResult =
-                        await TestStaticAsyncClass.TestMethodReturnWithParametersAsync(parameter1, parameter2);
+                        TestStaticAsyncClass.TestMethodReturnWithParametersAsync(parameter1, parameter2).GetAwaiter().GetResult();
 
                     ClassicAssert.AreNotEqual(originalResult, actualResult);
                     ClassicAssert.AreEqual(expectedResult, actualResult);
@@ -1109,7 +1109,7 @@ public class MockReturnsTests
             typeof(TestStaticClass), nameof(TestStaticClass.TestMethodReturnWithParameters),
             new SetupProperties
             {
-                MethodParametersTypes = new[] { typeof(int), typeof(string) }
+                MethodParametersTypes = [typeof(int), typeof(string)]
             },
             () =>
             {
@@ -1138,7 +1138,7 @@ public class MockReturnsTests
             typeof(TestStaticClass), nameof(TestStaticClass.TestMethodReturnWithParameters),
             new SetupProperties
             {
-                MethodParametersTypes = new[] { typeof(int), typeof(string) }
+                MethodParametersTypes = [typeof(int), typeof(string)]
             },
             () =>
             {

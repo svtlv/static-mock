@@ -60,6 +60,8 @@ void Mock.SetupDefault(Type type, string methodName);
 
 Accepts a validation `Action` that executes during the mock call. No disposal needed.
 
+The validation is synchronous. Never pass an `async` lambda: it becomes `async void`, and the hook can end before the assertion finishes. If the validation needs an async call, prefer the sequential API and `await` the call inside the `using` scope. Block with `.GetAwaiter().GetResult()` only when the call returns an already completed task (for example, the mock returns a completed task). Never block on a pending task: a `SynchronizationContext` or a custom `TaskScheduler` can stop its continuation and cause a deadlock.
+
 ```csharp
 // Func with validation
 IFuncMock<TReturn> mock = Mock.Setup<TReturn>(Expression<Func<TReturn>> expr, Action validation);
@@ -174,6 +176,8 @@ Multi-arg variants exist up to 9 arguments:
 ### On all mock types (`IMock`) — Throws
 
 **There is no `Throws(Exception instance)` overload.** Use one of these:
+
+**Do not use `Throws` on shared framework members** such as `DateTime.Now` or `DateTime.UtcNow`. The mock is process-wide, and the test adapter reads these members on its own thread. It gets the exception, and on .NET Framework the test host can crash. Mock an owned wrapper (for example, `Clock.Now`) instead. For .NET Framework test projects, also set `RunConfiguration.DisableAppDomain=true` in the `.runsettings` file (see `test-structure.md`).
 
 #### `.Throws<TException>()` — throw by generic type (requires parameterless constructor)
 

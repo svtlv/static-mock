@@ -422,7 +422,85 @@ public async Task Debug_Async_Mocking()
 }
 ```
 
+#### Known limitation on .NET 11
+
+On the .NET 11 runtime, SMock cannot mock generic method instantiations that return `Task`, `Task<T>`, `ValueTask` or `ValueTask<T>` (for example `Task.FromResult<int>`). MonoMod.Core 1.4.0-prerelease.3 does not support them yet. SMock throws a clear `NotSupportedException` and keeps the MonoMod exception as `InnerException`.
+
+```csharp
+// ❌ Throws NotSupportedException on the .NET 11 runtime (generic instantiation Task.FromResult<int>)
+using var mock = Mock.Setup(() => Task.FromResult(42)).Returns(Task.FromResult(100));
+
+// ✅ Non-generic async methods work on .NET 11 and on all other targets
+using var delayMock = Mock.Setup(context => Task.Delay(context.It.IsAny<int>()))
+    .Returns(Task.CompletedTask);
+```
+
+To work around the limitation, mock a non-generic method (for example a wrapper in your own code), or run these tests on `net10.0` or .NET Framework. All other target frameworks are not affected.
+
+#### Hierarchical validation must stay synchronous
+
+The validation parameter of the hierarchical `Mock.Setup` is an `Action`. Do not pass an `async` lambda to it: the lambda becomes `async void`, and the hook can end before the assertion finishes. If the validation needs an async call, prefer the sequential API and `await` the call inside the `using` scope. Block on the call with `.GetAwaiter().GetResult()` only when the call returns an already completed task (for example, the mock returns a completed task). Never block on a pending task: a `SynchronizationContext` or a custom `TaskScheduler` can stop its continuation and cause a deadlock.
+
 ## Runtime Issues
+
+### Test Host Crashes When Mocking Shared BCL Members
+
+**Problem**: On .NET Framework, the test host process crashes ("Test host process crashed", "Test Run Aborted") while a test mocks a shared framework member, for example `DateTime.Now` or `DateTime.UtcNow` with `.Throws<Exception>()`. No test is reported as failed, and the host writes nothing to stderr. The log often shows `Error processing <test> event for <test>` just before the crash. The test in that message can be an earlier test, because NUnit sends its events from a queue. The crash occurs in the Debug and the Release configuration. The Windows event log shows ".NET Runtime" event 1023 with exit code `80131506`.
+
+**Cause**: The NUnit adapter runs .NET Framework tests in a separate AppDomain. A hook on a member of `mscorlib` (such as `DateTime.Now`) changes code that all AppDomains share, but SMock loads the hook assembly only in the AppDomain of the test. The NUnit `EventPump` thread sends test events to the adapter in the default AppDomain. The adapter reads the time there and gets the mocked exception. When it builds the stack trace of this exception, the CLR finds no assembly for the hook frame in the default AppDomain and stops with an access violation in `Assembly::GetSecurityDescriptor`.
+
+```
+test AppDomain                          default AppDomain (adapter)
+--------------                          ---------------------------
+hook assembly is loaded here only
+Mock.Setup(() => DateTime.Now)
+  .Throws<Exception>()
+  patches shared mscorlib code  ------> adapter reads DateTime.Now
+                                          -> hook runs -> throws
+                                          -> adapter: ex.ToString()
+                                          -> hook frame has no assembly
+                                             in this AppDomain
+                                          -> CLR access violation, crash
+```
+
+**Note:** The patch on shared framework code is visible in every AppDomain, but the hook assembly is not. The crash occurs when the adapter builds a stack trace that contains the hook frame.
+
+**Solution**:
+- Run the tests in the default AppDomain. Set `DisableAppDomain` in a `.runsettings` file, and reference the file from the test project, so that `dotnet test` always uses it. .NET (Core) has no AppDomains and ignores this setting:
+
+```xml
+<!-- MyProject.Tests.runsettings -->
+<RunSettings>
+  <RunConfiguration>
+    <DisableAppDomain>true</DisableAppDomain>
+  </RunConfiguration>
+</RunSettings>
+```
+
+```xml
+<!-- MyProject.Tests.csproj -->
+<PropertyGroup>
+  <RunSettingsFilePath>$(MSBuildThisFileDirectory)MyProject.Tests.runsettings</RunSettingsFilePath>
+</PropertyGroup>
+```
+
+- If your suite runs tests in parallel, mark each test that mocks a shared framework member with `[NonParallelizable]`, so that no other test runs while the member is mocked:
+
+```csharp
+[Test]
+[NonParallelizable]
+public void TestDateTimeNowThrows()
+{
+    using var _ = Mock.Setup(context => DateTime.Now)
+        .Throws<Exception>();
+
+    Assert.Throws<Exception>(() => { var x = DateTime.Now; });
+}
+```
+
+- Prefer to mock your own wrapper (for example, a `Clock.Now` property) instead of a framework member that the test framework also uses.
+
+`DisableAppDomain` stops the crash, but the adapter can still get the mocked value or exception on its own thread. Then it logs `Error processing ... event` and can lose the result of one test. The Release configuration, `[NonParallelizable]` and `NumberOfTestWorkers=0` do not stop the crash: the `EventPump` thread stays active in each case.
 
 ### Hook Conflicts
 

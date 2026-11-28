@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <RunConfiguration>
+    <!--
+      .NET Framework only: run the tests in the default AppDomain, not in a separate NUnit AppDomain.
+      A hook on a shared framework member (for example DateTime.Now in mscorlib) is active in every
+      AppDomain, but the SMock hook assembly is loaded only in the AppDomain of the test. The NUnit
+      adapter reads the time in the default AppDomain while such a mock throws. It then builds the stack
+      trace of the mocked exception, and the CLR crashes with an access violation
+      (Assembly::GetSecurityDescriptor), because the hook frame has no assembly in that AppDomain.
+      .NET 10 and .NET 11 have no AppDomains and ignore this setting.
+    -->
+    <DisableAppDomain>true</DisableAppDomain>
+  </RunConfiguration>
+</RunSettings>

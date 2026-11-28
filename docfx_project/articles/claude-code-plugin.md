@@ -145,7 +145,7 @@ After writing tests, the skill updates (or creates) a `CLAUDE.md` in the project
 
 ```bash
 dotnet build --configuration Debug
-dotnet test --configuration Debug --framework net8.0 --verbosity minimal
+dotnet test --configuration Debug --framework net10.0 --verbosity minimal
 ```
 
 Build failures and test failures are diagnosed and fixed automatically before reporting success.

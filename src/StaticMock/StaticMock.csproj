@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net462;net47;net471;net472;net48;net481</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net462;net47;net471;net472;net48;net481;net11.0</TargetFrameworks>
     <Platforms>AnyCPU;x86;x64;</Platforms>
     <PackageId>SMock</PackageId>
     <Authors>svtlv</Authors>
@@ -14,13 +14,19 @@
     <PackageTags>mock moq static unit test tests smock</PackageTags>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Copyright>Copyright (c) 2021-present Artem Svetlov</Copyright>
-    <Version>2.6.0</Version>
+    <Version>2.7.0-preview.1</Version>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ImplicitUsings>disable</ImplicitUsings>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+  <!-- Harmless setting only: the library has no async methods, so this flag changes no library code.
+       The test projects use the same flag to compile their test entities as runtime-async methods. -->
+  <PropertyGroup Condition="'$(TargetFramework)'=='net11.0'">
+    <Features>$(Features);runtime-async=on</Features>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
@@ -41,13 +47,12 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net462' Or '$(TargetFramework)'=='net47' Or '$(TargetFramework)'=='net471' Or '$(TargetFramework)'=='net472' Or '$(TargetFramework)'=='net48' Or '$(TargetFramework)'=='net481'">
-    <PackageReference Include="MonoMod.RuntimeDetour" Version="22.7.31.1" />
+  <ItemGroup>
+    <PackageReference Include="MonoMod.Core" Version="1.4.0-prerelease.3" />
   </ItemGroup>
-  
+
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
-    <PackageReference Include="MonoMod.Core" Version="1.3.3" />
   </ItemGroup>
 
 </Project>
