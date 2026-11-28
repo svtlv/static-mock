@@ -117,12 +117,10 @@ jobs:
             exit 1
           fi
       - name: NuGet login (OIDC → temp API key)
-        env:
-          NUGET_USER: ${{ secrets.NUGET_USER }}
         uses: NuGet/login@v1
         id: login
         with:
-          user: "$NUGET_USER"   
+          user: ${{ secrets.NUGET_USER }}
       - name: Publish to NuGet
         env:
           NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
